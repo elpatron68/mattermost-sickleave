@@ -1,5 +1,5 @@
 {
-    "id": "com.elpatron68.mattermost-sickleave",
+    "id": "de.medisoftware.mattermost-sickleave",
     "name": "Sick Leave",
     "description": "Report sick leave via slash command and interactive dialogs.",
     "homepage_url": "https://github.com/elpatron68/mattermost-sickleave",

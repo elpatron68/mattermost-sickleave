@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/elpatron68/mattermost-sickleave/server/i18n"
+	"github.com/medisoftware/mattermost-sickleave/server/i18n"
 	"github.com/mattermost/mattermost/server/public/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

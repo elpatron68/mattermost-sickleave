@@ -10,9 +10,9 @@ import (
 	"github.com/mattermost/mattermost/server/public/pluginapi"
 	"github.com/pkg/errors"
 
-	"github.com/elpatron68/mattermost-sickleave/server/command"
-	"github.com/elpatron68/mattermost-sickleave/server/i18n"
-	"github.com/elpatron68/mattermost-sickleave/server/sickleave"
+	"github.com/medisoftware/mattermost-sickleave/server/command"
+	"github.com/medisoftware/mattermost-sickleave/server/i18n"
+	"github.com/medisoftware/mattermost-sickleave/server/sickleave"
 )
 
 type Plugin struct {

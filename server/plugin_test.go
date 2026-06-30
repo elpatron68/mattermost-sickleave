@@ -7,7 +7,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/elpatron68/mattermost-sickleave/server/dialog"
+	"github.com/medisoftware/mattermost-sickleave/server/dialog"
 	"github.com/mattermost/mattermost/server/public/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

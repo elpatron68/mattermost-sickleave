@@ -1,36 +1,50 @@
 # Mattermost Sick Leave Plugin
 
-Mattermost plugin for structured sick leave reporting (`Krankmeldung`) via slash commands and interactive dialogs.
+Mattermost plugin for structured sick leave reporting (`Krankmeldung`) via slash commands, a channel header menu, and date-picker dialogs.
 
-**Plugin ID:** `com.elpatron68.mattermost-sickleave`
+**Plugin ID:** `de.medisoftware.mattermost-sickleave`
 
 ## Features
 
-- `/sick-leave start` — initial report (first sick day)
-- `/sick-leave update` — expected return date and AU certificate status
-- `/sick-leave extend` — extend expected return date (with optional AU update)
-- `/sick-leave status` — show active sick leave
-- State machine enforced via KV store (A → B → C)
-- HR channel posts via bot `@sickleave`; updates and extensions as thread replies
-- German and English UI strings (server + webapp translations)
-- System Console settings: HR channel, default locale, max backdate days
+- Slash commands: `start`, `update`, `extend`, `end`, `status`, `help` (default trigger: `/sick-leave`)
+- Channel header button with action menu (start / update / extend / end depending on case state)
+- Custom webapp modals with HTML date pickers (Mattermost 10.5+)
+- State machine per user via KV store: initial report (A) → update (B) → extension (C) → close
+- HR channel posts via bot `@sickleave`; updates, extensions, and case closure as thread replies
+- Configurable report hashtag (default `#krankmeldung`) and slash command trigger (e.g. `krankmeldung`)
+- English and German UI (informal *Du* in DE)
+- System Console settings: HR channel, locale, backdate limit, hashtag, command trigger
+
+## Workflow variants
+
+| Variant | Purpose | Fields |
+|---------|---------|--------|
+| **A** | Initial report | First sick day |
+| **B** | Update after A | Expected return date, AU certificate (yes/no) |
+| **C** | Extension after B | New expected return date, optional AU update |
+| **End** | Close case | HR thread reply, active record cleared |
 
 ## Requirements
 
 | | |
 |---|---|
-| Mattermost | 6.2.1+ |
+| Mattermost | 6.2.1+ (tested with 10.5 for webapp date pickers) |
 | HR channel | Private channel ID configured in plugin settings |
 
 ## Slash commands
 
+Default trigger is `sick-leave`; configure another name in plugin settings (e.g. `krankmeldung`).
+
 | Command | When available | Purpose |
 |---------|----------------|---------|
-| `/sick-leave start` | No active case | Report first sick day |
-| `/sick-leave update` | After start (status: reported) | Expected return + AU certificate |
-| `/sick-leave extend` | After update (status: updated or extended) | New expected return date |
-| `/sick-leave status` | Any time | Show active case |
-| `/sick-leave help` | Any time | Show help |
+| `/… start` | No active case | Report first sick day |
+| `/… update` | After start (status: reported) | Expected return + AU certificate |
+| `/… extend` | After update (status: updated or extended) | New expected return date |
+| `/… end` | Active case | Close case and notify HR |
+| `/… status` | Any time | Show active case |
+| `/… help` | Any time | Show help |
+
+The channel header button opens the same actions in a menu.
 
 ## Configuration
 
@@ -40,10 +54,14 @@ Mattermost plugin for structured sick leave reporting (`Krankmeldung`) via slash
    - **HR Channel ID** — private HR channel (required)
    - **Default Locale** — `en` or `de`
    - **Maximum Backdate Days** — default `3`
+   - **Report Hashtag** — default `#krankmeldung`
+   - **Slash Command Trigger** — default `sick-leave`
+
+After changing the plugin ID or uploading an update: disable → enable the plugin and hard-refresh the browser (Ctrl+Shift+R).
 
 ## Development
 
-From the plugin root:
+From the plugin root (use Node from `.nvmrc` for webapp builds):
 
 ```bash
 # Regenerate manifest after plugin.json changes
@@ -54,7 +72,7 @@ make test
 
 # Production bundle (linux-amd64 + linux-arm64 + webapp)
 make dist
-# Output: dist/com.elpatron68.mattermost-sickleave-<version>.tar.gz
+# Output: dist/de.medisoftware.mattermost-sickleave-<version>.tar.gz
 
 # Deploy to local Mattermost
 export MM_SERVICESETTINGS_SITEURL=http://localhost:8065
@@ -77,7 +95,14 @@ macOS server binaries for local Mattermost-on-Mac development:
 make server-darwin
 ```
 
-See [docs/docs/HANDOFF.md](docs/docs/HANDOFF.md) for session handoff notes and open product decisions.
+## Project layout
+
+```
+mattermost-sickleave/
+├── plugin.json
+├── server/          # plugin, API, commands, dialogs, i18n, sickleave domain
+└── webapp/          # channel header, menus, date-picker modals, i18n
+```
 
 ## License
 

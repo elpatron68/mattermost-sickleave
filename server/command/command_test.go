@@ -3,9 +3,9 @@ package command
 import (
 	"testing"
 
-	"github.com/elpatron68/mattermost-sickleave/server/dialog"
-	"github.com/elpatron68/mattermost-sickleave/server/i18n"
-	"github.com/elpatron68/mattermost-sickleave/server/sickleave"
+	"github.com/medisoftware/mattermost-sickleave/server/dialog"
+	"github.com/medisoftware/mattermost-sickleave/server/i18n"
+	"github.com/medisoftware/mattermost-sickleave/server/sickleave"
 	"github.com/mattermost/mattermost/server/public/model"
 	"github.com/mattermost/mattermost/server/public/plugin/plugintest"
 	"github.com/mattermost/mattermost/server/public/pluginapi"
@@ -108,7 +108,7 @@ func newTestHandler(t *testing.T, store sickleave.Store, settings Settings, user
 			return settings
 		},
 		Bundle:    bundle,
-		PluginID:  "com.elpatron68.mattermost-sickleave",
+		PluginID:  "de.medisoftware.mattermost-sickleave",
 		BotUserID: "bot-1",
 	})
 

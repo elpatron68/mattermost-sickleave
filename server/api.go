@@ -9,7 +9,7 @@ import (
 	"github.com/mattermost/mattermost/server/public/model"
 	"github.com/mattermost/mattermost/server/public/plugin"
 
-	"github.com/elpatron68/mattermost-sickleave/server/command"
+	"github.com/medisoftware/mattermost-sickleave/server/command"
 )
 
 type sickLeaveContextResponse struct {

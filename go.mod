@@ -1,4 +1,4 @@
-module github.com/elpatron68/mattermost-sickleave
+module github.com/medisoftware/mattermost-sickleave
 
 go 1.25
 

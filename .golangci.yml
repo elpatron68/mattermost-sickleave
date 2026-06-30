@@ -61,4 +61,4 @@ formatters:
           replacement: any
     goimports:
       local-prefixes:
-        - github.com/elpatron68/mattermost-sickleave
+        - github.com/medisoftware/mattermost-sickleave

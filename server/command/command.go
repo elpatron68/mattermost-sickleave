@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/elpatron68/mattermost-sickleave/server/dialog"
-	"github.com/elpatron68/mattermost-sickleave/server/i18n"
-	"github.com/elpatron68/mattermost-sickleave/server/sickleave"
+	"github.com/medisoftware/mattermost-sickleave/server/dialog"
+	"github.com/medisoftware/mattermost-sickleave/server/i18n"
+	"github.com/medisoftware/mattermost-sickleave/server/sickleave"
 	"github.com/google/uuid"
 	"github.com/mattermost/mattermost/server/public/model"
 	"github.com/mattermost/mattermost/server/public/pluginapi"

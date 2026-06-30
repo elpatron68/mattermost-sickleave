@@ -3,7 +3,7 @@ package dialog
 import (
 	"time"
 
-	"github.com/elpatron68/mattermost-sickleave/server/i18n"
+	"github.com/medisoftware/mattermost-sickleave/server/i18n"
 	"github.com/mattermost/mattermost/server/public/model"
 )
 
