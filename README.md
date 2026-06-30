@@ -94,6 +94,16 @@ macOS server binaries for local Mattermost-on-Mac development:
 make server-darwin
 ```
 
+### Releases
+
+Bump version, update the changelog, commit, tag, and push:
+
+```bash
+./scripts/release.sh -v 0.1.2
+```
+
+Options: `--dry-run`, `--no-push`, `-y`, `--unsigned`. The Makefile also provides `make patch`, `make minor`, and `make major` for signed git tags without updating `plugin.json`.
+
 ## Project layout
 
 ```

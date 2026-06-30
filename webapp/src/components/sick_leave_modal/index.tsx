@@ -4,9 +4,9 @@
 import {connect} from 'react-redux';
 import {bindActionCreators, type Dispatch} from 'redux';
 
-import {getTheme} from 'mattermost-redux/selectors/entities/preferences';
-
 import type {GlobalState} from '@mattermost/types/store';
+
+import {getTheme} from 'mattermost-redux/selectors/entities/preferences';
 
 import {closeSickLeaveModal, submitSickLeaveModal} from 'actions/sickleave';
 import {

@@ -14,8 +14,22 @@ export default function SickLeaveIcon(): React.ReactElement {
             aria-hidden='true'
             role='img'
         >
-            <rect x='10' y='3' width='4' height='18' rx='1' fill={CROSS_COLOR}/>
-            <rect x='3' y='10' width='18' height='4' rx='1' fill={CROSS_COLOR}/>
+            <rect
+                x='10'
+                y='3'
+                width='4'
+                height='18'
+                rx='1'
+                fill={CROSS_COLOR}
+            />
+            <rect
+                x='3'
+                y='10'
+                width='18'
+                height='4'
+                rx='1'
+                fill={CROSS_COLOR}
+            />
         </svg>
     );
 }

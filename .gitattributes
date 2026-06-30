@@ -1,2 +1,4 @@
+* text=auto eol=lf
+
 server/manifest.go linguist-generated=true
 webapp/src/manifest.js linguist-generated=true

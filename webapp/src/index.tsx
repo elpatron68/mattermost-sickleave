@@ -1,21 +1,23 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import React from 'react';
+import {SET_SICK_LEAVE_CONTEXT} from 'action_types';
+import {fetchSickLeaveContext} from 'client';
 import manifest from 'manifest';
+import React from 'react';
+import reducer from 'reducer';
 import type {Store} from 'redux';
-
-import {getCurrentUserLocale} from 'mattermost-redux/selectors/entities/i18n';
 
 import type {GlobalState} from '@mattermost/types/store';
 
+import {getCurrentUserLocale} from 'mattermost-redux/selectors/entities/i18n';
+
 import {confirmEndCase, endSickLeaveCase, openSickLeaveMenu, openSickLeaveModal, parseSickLeaveCommand} from 'actions/sickleave';
+import {sickLeaveCommandTrigger} from 'selectors';
+
 import SickLeaveIcon from 'components/icons/sickleave';
 import Root from 'components/root';
-import {SET_SICK_LEAVE_CONTEXT} from 'action_types';
-import {fetchSickLeaveContext} from 'client';
-import reducer from 'reducer';
-import {sickLeaveCommandTrigger} from 'selectors';
+
 import type {PluginRegistry} from 'types/mattermost-webapp';
 
 import de from '../i18n/de.json';

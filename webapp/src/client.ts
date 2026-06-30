@@ -1,10 +1,11 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import {getPluginURL} from 'utils';
+
 import {Client4} from 'mattermost-redux/client';
 
 import type {SickLeaveContext, SickLeaveVariant} from 'types';
-import {getPluginURL} from 'utils';
 
 type SubmitDialogResponse = {
     errors?: Record<string, string>;

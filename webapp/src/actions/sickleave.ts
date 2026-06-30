@@ -1,11 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {Client4} from 'mattermost-redux/client';
-import {getCurrentUserLocale} from 'mattermost-redux/selectors/entities/i18n';
-
-import type {GlobalState} from '@mattermost/types/store';
-
 import {
     CLOSE_SICK_LEAVE_MENU,
     CLOSE_SICK_LEAVE_MODAL,
@@ -19,6 +14,12 @@ import {
     SET_SICK_LEAVE_SUBMITTING,
 } from 'action_types';
 import {endSickLeave, fetchSickLeaveContext, submitSickLeaveDialog} from 'client';
+
+import type {GlobalState} from '@mattermost/types/store';
+
+import {Client4} from 'mattermost-redux/client';
+import {getCurrentUserLocale} from 'mattermost-redux/selectors/entities/i18n';
+
 import {
     sickLeaveChannelId,
     sickLeaveMenuChannelId,
@@ -26,6 +27,7 @@ import {
     sickLeaveTeamId,
     sickLeaveVariant,
 } from 'selectors';
+
 import type {MenuAction, SickLeaveVariant} from 'types';
 
 import de from '../../i18n/de.json';
@@ -45,6 +47,7 @@ function getTranslationsForLocale(locale: string): Record<string, string> {
 export function confirmEndCase(getState: () => GlobalState): boolean {
     const locale = getCurrentUserLocale(getState());
     const translations = getTranslationsForLocale(locale);
+    // eslint-disable-next-line no-alert -- native confirm for destructive end action
     return window.confirm(translations['menu.end.confirm'] || 'Close your active sick leave case? HR will be notified.');
 }
 

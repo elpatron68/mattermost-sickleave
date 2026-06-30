@@ -3,10 +3,11 @@
 
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
+import {getAvailableMenuActions} from 'utils/menu';
+
 import {changeOpacity} from 'mattermost-redux/utils/theme_utils';
 
 import type {MenuAction, SickLeaveContext} from 'types';
-import {getAvailableMenuActions} from 'utils/menu';
 
 import './sick_leave_menu.css';
 
@@ -29,15 +30,40 @@ export default class SickLeaveMenu extends React.PureComponent<Props> {
     private labelForAction(action: MenuAction): React.ReactNode {
         switch (action) {
         case 'start':
-            return <FormattedMessage id='menu.action.start' defaultMessage='Report sick leave'/>;
+            return (
+                <FormattedMessage
+                    id='menu.action.start'
+                    defaultMessage='Report sick leave'
+                />
+            );
         case 'update':
-            return <FormattedMessage id='menu.action.update' defaultMessage='Update sick leave'/>;
+            return (
+                <FormattedMessage
+                    id='menu.action.update'
+                    defaultMessage='Update sick leave'
+                />
+            );
         case 'extend':
-            return <FormattedMessage id='menu.action.extend' defaultMessage='Extend sick leave'/>;
+            return (
+                <FormattedMessage
+                    id='menu.action.extend'
+                    defaultMessage='Extend sick leave'
+                />
+            );
         case 'end':
-            return <FormattedMessage id='menu.action.end' defaultMessage='Close sick leave case'/>;
+            return (
+                <FormattedMessage
+                    id='menu.action.end'
+                    defaultMessage='Close sick leave case'
+                />
+            );
         case 'status':
-            return <FormattedMessage id='menu.action.status' defaultMessage='Show status'/>;
+            return (
+                <FormattedMessage
+                    id='menu.action.status'
+                    defaultMessage='Show status'
+                />
+            );
         default:
             return null;
         }
@@ -48,7 +74,10 @@ export default class SickLeaveMenu extends React.PureComponent<Props> {
         if (!context?.active) {
             return (
                 <p className='sickleave-menu__status'>
-                    <FormattedMessage id='menu.status.none' defaultMessage='You do not have an active sick leave report.'/>
+                    <FormattedMessage
+                        id='menu.status.none'
+                        defaultMessage='You do not have an active sick leave report.'
+                    />
                 </p>
             );
         }
@@ -104,7 +133,10 @@ export default class SickLeaveMenu extends React.PureComponent<Props> {
                     aria-modal='true'
                 >
                     <h2 className='sickleave-menu__title'>
-                        <FormattedMessage id='menu.title' defaultMessage='Sick leave'/>
+                        <FormattedMessage
+                            id='menu.title'
+                            defaultMessage='Sick leave'
+                        />
                     </h2>
                     {this.renderStatus()}
                     <div className='sickleave-menu__actions'>
@@ -130,7 +162,10 @@ export default class SickLeaveMenu extends React.PureComponent<Props> {
                             onClick={this.props.onClose}
                             disabled={busy}
                         >
-                            <FormattedMessage id='menu.close' defaultMessage='Close'/>
+                            <FormattedMessage
+                                id='menu.close'
+                                defaultMessage='Close'
+                            />
                         </button>
                     </div>
                 </div>

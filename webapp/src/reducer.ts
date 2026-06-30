@@ -1,8 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import {combineReducers} from 'redux';
-
 import {
     CLOSE_SICK_LEAVE_MENU,
     CLOSE_SICK_LEAVE_MODAL,
@@ -15,6 +13,8 @@ import {
     SET_SICK_LEAVE_MENU_LOADING,
     SET_SICK_LEAVE_SUBMITTING,
 } from 'action_types';
+import {combineReducers} from 'redux';
+
 import type {SickLeaveContext, SickLeaveVariant} from 'types';
 
 type OpenModalAction = {

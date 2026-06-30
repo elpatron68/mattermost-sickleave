@@ -1,9 +1,10 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import manifest from 'manifest';
+
 import type {GlobalState} from '@mattermost/types/store';
 
-import manifest from 'manifest';
 import type {SickLeaveContext, SickLeaveVariant} from 'types';
 
 type PluginState = {

@@ -3,10 +3,11 @@
 
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
+import {addDays, formatISODate, parseISODate} from 'utils';
+
 import {changeOpacity} from 'mattermost-redux/utils/theme_utils';
 
 import type {SickLeaveContext, SickLeaveVariant} from 'types';
-import {addDays, formatISODate, parseISODate} from 'utils';
 
 import './sick_leave_modal.css';
 
@@ -111,7 +112,10 @@ export default class SickLeaveModal extends React.PureComponent<Props, State> {
     ): React.ReactNode {
         const bounds = this.getDateBounds();
         return (
-            <label className='sickleave-modal__field' htmlFor={id}>
+            <label
+                className='sickleave-modal__field'
+                htmlFor={id}
+            >
                 <span className='sickleave-modal__label'>{label}</span>
                 <input
                     id={id}
@@ -140,7 +144,10 @@ export default class SickLeaveModal extends React.PureComponent<Props, State> {
         error?: string,
     ): React.ReactNode {
         return (
-            <label className='sickleave-modal__field' htmlFor={id}>
+            <label
+                className='sickleave-modal__field'
+                htmlFor={id}
+            >
                 <span className='sickleave-modal__label'>{label}</span>
                 <select
                     id={id}
@@ -151,7 +158,11 @@ export default class SickLeaveModal extends React.PureComponent<Props, State> {
                     required={!optional}
                 >
                     {!optional && (
-                        <option value='' disabled={true} hidden={true}>
+                        <option
+                            value=''
+                            disabled={true}
+                            hidden={true}
+                        >
                             {'—'}
                         </option>
                     )}
@@ -164,7 +175,10 @@ export default class SickLeaveModal extends React.PureComponent<Props, State> {
                         </option>
                     )}
                     {options.map((option) => (
-                        <option key={option.value} value={option.value}>
+                        <option
+                            key={option.value}
+                            value={option.value}
+                        >
                             {option.label}
                         </option>
                     ))}
@@ -178,18 +192,43 @@ export default class SickLeaveModal extends React.PureComponent<Props, State> {
         const {variant, fieldErrors, submitting} = this.props;
         const {startDate, expectedEndDate, auCertificate} = this.state;
         const yesNoOptions = [
-            {value: 'yes', label: <FormattedMessage id='dialog.au.yes' defaultMessage='Yes'/>},
-            {value: 'no', label: <FormattedMessage id='dialog.au.no' defaultMessage='No'/>},
+            {
+                value: 'yes',
+                label: (
+                    <FormattedMessage
+                        id='dialog.au.yes'
+                        defaultMessage='Yes'
+                    />
+                ),
+            },
+            {
+                value: 'no',
+                label: (
+                    <FormattedMessage
+                        id='dialog.au.no'
+                        defaultMessage='No'
+                    />
+                ),
+            },
         ];
 
         return (
-            <form className='sickleave-modal__form' onSubmit={this.handleSubmit}>
+            <form
+                className='sickleave-modal__form'
+                onSubmit={this.handleSubmit}
+            >
                 {variant === 'start' && this.renderDateField(
                     'start_date',
-                    <FormattedMessage id='dialog.a.start_date' defaultMessage='First sick day'/>,
+                    <FormattedMessage
+                        id='dialog.a.start_date'
+                        defaultMessage='First sick day'
+                    />,
                     startDate,
                     (value) => this.setState({startDate: value}),
-                    <FormattedMessage id='dialog.a.start_date_help' defaultMessage='Cannot be in the future.'/>,
+                    <FormattedMessage
+                        id='dialog.a.start_date_help'
+                        defaultMessage='Cannot be in the future.'
+                    />,
                     fieldErrors.start_date,
                 )}
 
@@ -197,15 +236,24 @@ export default class SickLeaveModal extends React.PureComponent<Props, State> {
                     <>
                         {this.renderDateField(
                             'expected_end_date',
-                            <FormattedMessage id='dialog.b.expected_end' defaultMessage='Expected return date'/>,
+                            <FormattedMessage
+                                id='dialog.b.expected_end'
+                                defaultMessage='Expected return date'
+                            />,
                             expectedEndDate,
                             (value) => this.setState({expectedEndDate: value}),
-                            <FormattedMessage id='dialog.b.expected_end_help' defaultMessage='Must be on or after your first sick day.'/>,
+                            <FormattedMessage
+                                id='dialog.b.expected_end_help'
+                                defaultMessage='Must be on or after your first sick day.'
+                            />,
                             fieldErrors.expected_end_date,
                         )}
                         {this.renderSelectField(
                             'au_certificate',
-                            <FormattedMessage id='dialog.b.au_certificate' defaultMessage='Medical certificate (AU)'/>,
+                            <FormattedMessage
+                                id='dialog.b.au_certificate'
+                                defaultMessage='Medical certificate (AU)'
+                            />,
                             auCertificate,
                             yesNoOptions,
                             (value) => this.setState({auCertificate: value}),
@@ -219,15 +267,24 @@ export default class SickLeaveModal extends React.PureComponent<Props, State> {
                     <>
                         {this.renderDateField(
                             'expected_end_date',
-                            <FormattedMessage id='dialog.c.expected_end' defaultMessage='New expected return date'/>,
+                            <FormattedMessage
+                                id='dialog.c.expected_end'
+                                defaultMessage='New expected return date'
+                            />,
                             expectedEndDate,
                             (value) => this.setState({expectedEndDate: value}),
-                            <FormattedMessage id='dialog.c.expected_end_help' defaultMessage='Must be after your current expected return date.'/>,
+                            <FormattedMessage
+                                id='dialog.c.expected_end_help'
+                                defaultMessage='Must be after your current expected return date.'
+                            />,
                             fieldErrors.expected_end_date,
                         )}
                         {this.renderSelectField(
                             'au_certificate',
-                            <FormattedMessage id='dialog.c.au_certificate' defaultMessage='Medical certificate (AU)'/>,
+                            <FormattedMessage
+                                id='dialog.c.au_certificate'
+                                defaultMessage='Medical certificate (AU)'
+                            />,
                             auCertificate,
                             yesNoOptions,
                             (value) => this.setState({auCertificate: value}),
@@ -250,14 +307,20 @@ export default class SickLeaveModal extends React.PureComponent<Props, State> {
                         onClick={this.props.onClose}
                         disabled={submitting}
                     >
-                        <FormattedMessage id='dialog.cancel' defaultMessage='Cancel'/>
+                        <FormattedMessage
+                            id='dialog.cancel'
+                            defaultMessage='Cancel'
+                        />
                     </button>
                     <button
                         type='submit'
                         className='sickleave-modal__button sickleave-modal__button--primary'
                         disabled={submitting}
                     >
-                        <FormattedMessage id='dialog.submit' defaultMessage='Submit'/>
+                        <FormattedMessage
+                            id='dialog.submit'
+                            defaultMessage='Submit'
+                        />
                     </button>
                 </div>
             </form>
@@ -267,11 +330,26 @@ export default class SickLeaveModal extends React.PureComponent<Props, State> {
     private titleForVariant(): React.ReactNode {
         switch (this.props.variant) {
         case 'start':
-            return <FormattedMessage id='dialog.a.title' defaultMessage='Report sick leave'/>;
+            return (
+                <FormattedMessage
+                    id='dialog.a.title'
+                    defaultMessage='Report sick leave'
+                />
+            );
         case 'update':
-            return <FormattedMessage id='dialog.b.title' defaultMessage='Update sick leave'/>;
+            return (
+                <FormattedMessage
+                    id='dialog.b.title'
+                    defaultMessage='Update sick leave'
+                />
+            );
         case 'extend':
-            return <FormattedMessage id='dialog.c.title' defaultMessage='Extend sick leave'/>;
+            return (
+                <FormattedMessage
+                    id='dialog.c.title'
+                    defaultMessage='Extend sick leave'
+                />
+            );
         default:
             return null;
         }
@@ -280,11 +358,26 @@ export default class SickLeaveModal extends React.PureComponent<Props, State> {
     private introForVariant(): React.ReactNode {
         switch (this.props.variant) {
         case 'start':
-            return <FormattedMessage id='dialog.a.intro' defaultMessage='Enter the first day you were unable to work due to illness.'/>;
+            return (
+                <FormattedMessage
+                    id='dialog.a.intro'
+                    defaultMessage='Enter the first day you were unable to work due to illness.'
+                />
+            );
         case 'update':
-            return <FormattedMessage id='dialog.b.intro' defaultMessage='Provide your expected return date and whether you have a medical certificate (AU).'/>;
+            return (
+                <FormattedMessage
+                    id='dialog.b.intro'
+                    defaultMessage='Provide your expected return date and whether you have a medical certificate (AU).'
+                />
+            );
         case 'extend':
-            return <FormattedMessage id='dialog.c.intro' defaultMessage='Enter a new expected return date if your sick leave continues.'/>;
+            return (
+                <FormattedMessage
+                    id='dialog.c.intro'
+                    defaultMessage='Enter a new expected return date if your sick leave continues.'
+                />
+            );
         default:
             return null;
         }
