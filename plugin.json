@@ -1,9 +1,9 @@
 {
-    "id": "com.mattermost.plugin-starter-template",
-    "name": "Plugin Starter Template",
-    "description": "This plugin serves as a starting point for writing a Mattermost plugin.",
-    "homepage_url": "https://github.com/mattermost/mattermost-plugin-starter-template",
-    "support_url": "https://github.com/mattermost/mattermost-plugin-starter-template/issues",
+    "id": "com.elpatron68.mattermost-sickleave",
+    "name": "Sick Leave",
+    "description": "Report sick leave via slash command and interactive dialogs.",
+    "homepage_url": "https://github.com/elpatron68/mattermost-sickleave",
+    "support_url": "https://github.com/elpatron68/mattermost-sickleave/issues",
     "icon_path": "assets/starter-template-icon.svg",
     "min_server_version": "6.2.1",
     "server": {
@@ -19,8 +19,39 @@
         "bundle_path": "webapp/dist/main.js"
     },
     "settings_schema": {
-        "header": "",
+        "header": "Configure where sick leave reports are posted and validation rules.",
         "footer": "",
-        "settings": []
+        "settings": [
+            {
+                "key": "HRChannelID",
+                "display_name": "HR Channel ID",
+                "type": "text",
+                "help_text": "The channel ID where sick leave reports are posted (private HR channel recommended).",
+                "placeholder": ""
+            },
+            {
+                "key": "DefaultLocale",
+                "display_name": "Default Locale",
+                "type": "dropdown",
+                "default": "en",
+                "options": [
+                    {
+                        "display_name": "English",
+                        "value": "en"
+                    },
+                    {
+                        "display_name": "Deutsch",
+                        "value": "de"
+                    }
+                ]
+            },
+            {
+                "key": "MaxBackdateDays",
+                "display_name": "Maximum Backdate Days",
+                "type": "number",
+                "default": 3,
+                "help_text": "How many days in the past the first sick day may be."
+            }
+        ]
     }
 }

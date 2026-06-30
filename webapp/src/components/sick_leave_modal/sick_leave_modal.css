@@ -1,0 +1,87 @@
+.sickleave-modal__panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75em;
+    width: min(28em, calc(100vw - 2em));
+    max-height: calc(100vh - 2em);
+    padding: 1em 1.1em;
+    border-radius: 4px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.sickleave-modal__title {
+    margin: 0;
+    font-size: 1.15em;
+    font-weight: 600;
+}
+
+.sickleave-modal__intro {
+    margin: 0;
+    font-size: 0.92em;
+    opacity: 0.85;
+}
+
+.sickleave-modal__form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85em;
+}
+
+.sickleave-modal__field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35em;
+}
+
+.sickleave-modal__label {
+    font-weight: 600;
+    font-size: 0.92em;
+}
+
+.sickleave-modal__date,
+.sickleave-modal__select {
+    width: 100%;
+    padding: 0.45em 0.55em;
+    font-size: 1em;
+    border: 1px solid rgba(0, 0, 0, 0.16);
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.sickleave-modal__help {
+    font-size: 0.82em;
+    opacity: 0.75;
+}
+
+.sickleave-modal__error {
+    font-size: 0.82em;
+    color: #d24b4e;
+}
+
+.sickleave-modal__error--general {
+    margin-top: 0.25em;
+}
+
+.sickleave-modal__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5em;
+    margin-top: 0.25em;
+}
+
+.sickleave-modal__button {
+    padding: 0.45em 0.85em;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-size: 0.95em;
+}
+
+.sickleave-modal__button--primary {
+    font-weight: 600;
+}
+
+.sickleave-modal__button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

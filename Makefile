@@ -26,7 +26,20 @@ default: all
 # Verify environment, and define PLUGIN_ID, PLUGIN_VERSION, HAS_SERVER and HAS_WEBAPP as needed.
 include build/setup.mk
 
-BUNDLE_NAME ?= $(PLUGIN_ID)-$(PLUGIN_VERSION).tar.gz
+# Append commit hash to bundle name for untagged dev builds.
+BUILD_HASH_SHORT ?= $(shell git rev-parse --short HEAD 2>/dev/null)
+GIT_RELEASE_TAG_AT_HEAD := $(strip $(shell git tag --points-at HEAD 2>/dev/null | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+(-rc[0-9]+)?$$' | head -1))
+ifeq ($(GIT_RELEASE_TAG_AT_HEAD),)
+ifneq ($(BUILD_HASH_SHORT),)
+BUNDLE_VERSION := $(PLUGIN_VERSION)+$(BUILD_HASH_SHORT)
+else
+BUNDLE_VERSION := $(PLUGIN_VERSION)
+endif
+else
+BUNDLE_VERSION := $(PLUGIN_VERSION)
+endif
+
+BUNDLE_NAME ?= $(PLUGIN_ID)-$(BUNDLE_VERSION).tar.gz
 
 # Include custom makefile, if present
 ifneq ($(wildcard build/custom.mk),)
@@ -35,8 +48,10 @@ endif
 
 ifneq ($(MM_DEBUG),)
 	GO_BUILD_GCFLAGS = -gcflags "all=-N -l"
+	GO_BUILD_LDFLAGS =
 else
 	GO_BUILD_GCFLAGS =
+	GO_BUILD_LDFLAGS = -s -w
 endif
 
 
@@ -206,7 +221,7 @@ ifneq ($(HAS_SERVER),)
 	$(GOBIN)/golangci-lint run ./...
 endif
 
-## Builds the server, if it exists, for all supported architectures, unless MM_SERVICESETTINGS_ENABLEDEVELOPER is set.
+## Builds Linux server binaries for release (amd64 + arm64), unless MM_SERVICESETTINGS_ENABLEDEVELOPER is set.
 .PHONY: server
 server:
 ifneq ($(HAS_SERVER),)
@@ -217,20 +232,26 @@ endif
 	mkdir -p server/dist;
 ifneq ($(MM_SERVICESETTINGS_ENABLEDEVELOPER),)
 	@echo Building plugin only for $(DEFAULT_GOOS)-$(DEFAULT_GOARCH) because MM_SERVICESETTINGS_ENABLEDEVELOPER is enabled
-	cd server && env CGO_ENABLED=0 $(GO) build $(GO_BUILD_FLAGS) $(GO_BUILD_GCFLAGS) -trimpath -o dist/plugin-$(DEFAULT_GOOS)-$(DEFAULT_GOARCH);
+	cd server && env CGO_ENABLED=0 $(GO) build $(GO_BUILD_FLAGS) -ldflags="$(GO_BUILD_LDFLAGS)" $(GO_BUILD_GCFLAGS) -trimpath -o dist/plugin-$(DEFAULT_GOOS)-$(DEFAULT_GOARCH);
 else
-	cd server && env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GO) build $(GO_BUILD_FLAGS) $(GO_BUILD_GCFLAGS) -trimpath -o dist/plugin-linux-amd64;
-	cd server && env CGO_ENABLED=0 GOOS=linux GOARCH=arm64 $(GO) build $(GO_BUILD_FLAGS) $(GO_BUILD_GCFLAGS) -trimpath -o dist/plugin-linux-arm64;
-	cd server && env CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 $(GO) build $(GO_BUILD_FLAGS) $(GO_BUILD_GCFLAGS) -trimpath -o dist/plugin-darwin-amd64;
-	cd server && env CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 $(GO) build $(GO_BUILD_FLAGS) $(GO_BUILD_GCFLAGS) -trimpath -o dist/plugin-darwin-arm64;
-	cd server && env CGO_ENABLED=0 GOOS=windows GOARCH=amd64 $(GO) build $(GO_BUILD_FLAGS) $(GO_BUILD_GCFLAGS) -trimpath -o dist/plugin-windows-amd64.exe;
+	cd server && env CGO_ENABLED=0 GOOS=linux GOARCH=amd64 $(GO) build $(GO_BUILD_FLAGS) -ldflags="$(GO_BUILD_LDFLAGS)" $(GO_BUILD_GCFLAGS) -trimpath -o dist/plugin-linux-amd64;
+	cd server && env CGO_ENABLED=0 GOOS=linux GOARCH=arm64 $(GO) build $(GO_BUILD_FLAGS) -ldflags="$(GO_BUILD_LDFLAGS)" $(GO_BUILD_GCFLAGS) -trimpath -o dist/plugin-linux-arm64;
 endif
+endif
+
+## Optional: build macOS server binaries for local Mattermost-on-Mac development (not included in release bundles).
+.PHONY: server-darwin
+server-darwin:
+ifneq ($(HAS_SERVER),)
+	mkdir -p server/dist
+	cd server && env CGO_ENABLED=0 GOOS=darwin GOARCH=amd64 $(GO) build $(GO_BUILD_FLAGS) -ldflags="$(GO_BUILD_LDFLAGS)" $(GO_BUILD_GCFLAGS) -trimpath -o dist/plugin-darwin-amd64;
+	cd server && env CGO_ENABLED=0 GOOS=darwin GOARCH=arm64 $(GO) build $(GO_BUILD_FLAGS) -ldflags="$(GO_BUILD_LDFLAGS)" $(GO_BUILD_GCFLAGS) -trimpath -o dist/plugin-darwin-arm64;
 endif
 
 ## Ensures NPM dependencies are installed without having to run this all the time.
 webapp/node_modules: $(wildcard webapp/package.json)
 ifneq ($(HAS_WEBAPP),)
-	cd webapp && $(NPM) install
+	cd webapp && "$(NPM)" install
 	touch $@
 endif
 
@@ -239,9 +260,9 @@ endif
 webapp: webapp/node_modules
 ifneq ($(HAS_WEBAPP),)
 ifeq ($(MM_DEBUG),)
-	cd webapp && $(NPM) run build;
+	cd webapp && "$(NPM)" run build;
 else
-	cd webapp && $(NPM) run debug;
+	cd webapp && "$(NPM)" run debug;
 endif
 endif
 
@@ -265,11 +286,11 @@ ifneq ($(HAS_WEBAPP),)
 	mkdir -p dist/$(PLUGIN_ID)/webapp
 	cp -r webapp/dist dist/$(PLUGIN_ID)/webapp/
 endif
-ifeq ($(shell uname),Darwin)
-	cd dist && tar --disable-copyfile -cvzf $(BUNDLE_NAME) $(PLUGIN_ID)
-else
-	cd dist && tar -cvzf $(BUNDLE_NAME) $(PLUGIN_ID)
+ifneq ($(HAS_SERVER),)
+	chmod +x dist/$(PLUGIN_ID)/server/dist/plugin-linux-amd64 2>/dev/null || true
+	chmod +x dist/$(PLUGIN_ID)/server/dist/plugin-linux-arm64 2>/dev/null || true
 endif
+	python3 build/package_bundle.py dist/$(PLUGIN_ID) dist/$(BUNDLE_NAME) || python build/package_bundle.py dist/$(PLUGIN_ID) dist/$(BUNDLE_NAME)
 
 	@echo plugin built at: dist/$(BUNDLE_NAME)
 
@@ -291,9 +312,9 @@ deploy: dist
 .PHONY: watch
 watch: apply server bundle
 ifeq ($(MM_DEBUG),)
-	cd webapp && $(NPM) run build:watch
+	cd webapp && "$(NPM)" run build:watch
 else
-	cd webapp && $(NPM) run debug:watch
+	cd webapp && "$(NPM)" run debug:watch
 endif
 
 ## Installs a previous built plugin with updated webpack assets to a server.
@@ -348,7 +369,7 @@ ifneq ($(HAS_SERVER),)
 	$(GOBIN)/gotestsum -- -v ./...
 endif
 ifneq ($(HAS_WEBAPP),)
-	cd webapp && $(NPM) run test;
+	cd webapp && "$(NPM)" run test;
 endif
 
 ## Runs any lints and unit tests defined for the server and webapp, if they exist, optimized
@@ -359,7 +380,7 @@ ifneq ($(HAS_SERVER),)
 	$(GOBIN)/gotestsum --format standard-verbose --junitfile report.xml -- ./...
 endif
 ifneq ($(HAS_WEBAPP),)
-	cd webapp && $(NPM) run test;
+	cd webapp && "$(NPM)" run test;
 endif
 
 ## Creates a coverage report for the server code.
@@ -436,5 +457,5 @@ help:
 mock:
 ifneq ($(HAS_SERVER),)
 	go install go.uber.org/mock/mockgen@v0.6.0
-	mockgen -destination=server/command/mocks/mock_commands.go -package=mocks github.com/mattermost/mattermost-plugin-starter-template/server/command Command
+	mockgen -destination=server/command/mocks/mock_commands.go -package=mocks github.com/elpatron68/mattermost-sickleave/server/command Command
 endif

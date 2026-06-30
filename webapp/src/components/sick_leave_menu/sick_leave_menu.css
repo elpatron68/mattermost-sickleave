@@ -1,0 +1,67 @@
+.sickleave-menu__panel {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85em;
+    width: min(24em, calc(100vw - 2em));
+    max-height: calc(100vh - 2em);
+    padding: 1em 1.1em;
+    border-radius: 4px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.sickleave-menu__title {
+    margin: 0;
+    font-size: 1.15em;
+    font-weight: 600;
+}
+
+.sickleave-menu__status {
+    margin: 0;
+    font-size: 0.92em;
+    line-height: 1.45;
+    white-space: pre-wrap;
+}
+
+.sickleave-menu__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.sickleave-menu__action {
+    width: 100%;
+    padding: 0.55em 0.75em;
+    text-align: left;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 4px;
+    background: transparent;
+    cursor: pointer;
+    font-size: 0.95em;
+}
+
+.sickleave-menu__action--danger {
+    color: #d24b4e;
+}
+
+.sickleave-menu__action:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.sickleave-menu__error {
+    font-size: 0.85em;
+    color: #d24b4e;
+}
+
+.sickleave-menu__footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.sickleave-menu__button {
+    padding: 0.45em 0.85em;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    font-size: 0.95em;
+}

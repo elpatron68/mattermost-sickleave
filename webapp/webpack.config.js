@@ -81,6 +81,7 @@ const config = {
         'prop-types': 'PropTypes',
         'react-bootstrap': 'ReactBootstrap',
         'react-router-dom': 'ReactRouterDom',
+        'react-intl': 'ReactIntl',
     },
     output: {
         devtoolNamespace: PLUGIN_ID,

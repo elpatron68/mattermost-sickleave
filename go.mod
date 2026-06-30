@@ -1,4 +1,4 @@
-module github.com/mattermost/mattermost-plugin-starter-template
+module github.com/elpatron68/mattermost-sickleave
 
 go 1.25
 

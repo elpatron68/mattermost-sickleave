@@ -1,28 +1,32 @@
 package main
 
 import (
+	"encoding/json"
+	"io"
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/mattermost/mattermost/server/public/model"
 	"github.com/mattermost/mattermost/server/public/plugin"
 )
 
-// initRouter initializes the HTTP router for the plugin.
+type sickLeaveContextResponse struct {
+	Active          any `json:"active,omitempty"`
+	MaxBackdateDays int `json:"max_backdate_days"`
+}
+
 func (p *Plugin) initRouter() *mux.Router {
 	router := mux.NewRouter()
-
-	// Middleware to require that the user is logged in
 	router.Use(p.MattermostAuthorizationRequired)
 
 	apiRouter := router.PathPrefix("/api/v1").Subrouter()
-
-	apiRouter.HandleFunc("/hello", p.HelloWorld).Methods(http.MethodGet)
+	apiRouter.HandleFunc("/context", p.handleSickLeaveContext).Methods(http.MethodGet)
+	apiRouter.HandleFunc("/dialog/submit", p.handleDialogSubmit).Methods(http.MethodPost)
+	apiRouter.HandleFunc("/end", p.handleEnd).Methods(http.MethodPost)
 
 	return router
 }
 
-// ServeHTTP demonstrates a plugin that handles HTTP requests by greeting the world.
-// The root URL is currently <siteUrl>/plugins/com.mattermost.plugin-starter-template/api/v1/. Replace com.mattermost.plugin-starter-template with the plugin ID.
 func (p *Plugin) ServeHTTP(c *plugin.Context, w http.ResponseWriter, r *http.Request) {
 	p.router.ServeHTTP(w, r)
 }
@@ -39,9 +43,100 @@ func (p *Plugin) MattermostAuthorizationRequired(next http.Handler) http.Handler
 	})
 }
 
-func (p *Plugin) HelloWorld(w http.ResponseWriter, r *http.Request) {
-	if _, err := w.Write([]byte("Hello, world!")); err != nil {
-		p.API.LogError("Failed to write response", "error", err)
+func (p *Plugin) handleSickLeaveContext(w http.ResponseWriter, r *http.Request) {
+	userID := r.Header.Get("Mattermost-User-ID")
+	settings := p.settingsFromConfig()
+
+	active, err := p.kvstore.GetActive(userID)
+	if err != nil {
+		p.API.LogError("Failed to load active sick leave", "error", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	maxBackdate := settings.MaxBackdateDays
+	if maxBackdate <= 0 {
+		maxBackdate = 3
+	}
+
+	response := sickLeaveContextResponse{
+		Active:          active,
+		MaxBackdateDays: maxBackdate,
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		p.API.LogError("Failed to encode sick leave context", "error", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func (p *Plugin) handleDialogSubmit(w http.ResponseWriter, r *http.Request) {
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		p.API.LogError("Failed to read dialog submission", "error", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	var request model.SubmitDialogRequest
+	if err := json.Unmarshal(body, &request); err != nil {
+		p.API.LogError("Failed to decode dialog submission", "error", err)
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if request.UserId == "" {
+		request.UserId = r.Header.Get("Mattermost-User-ID")
+	}
+
+	var response *model.SubmitDialogResponse
+	response, err = p.command.SubmitDialog(&request)
+	if err != nil {
+		p.API.LogError("Failed to process dialog submission", "error", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		p.API.LogError("Failed to encode dialog response", "error", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+type endRequest struct {
+	ChannelID string `json:"channel_id"`
+}
+
+type endResponse struct {
+	Message string `json:"message"`
+	Error   string `json:"error,omitempty"`
+}
+
+func (p *Plugin) handleEnd(w http.ResponseWriter, r *http.Request) {
+	userID := r.Header.Get("Mattermost-User-ID")
+
+	var request endRequest
+	if r.Body != nil {
+		if err := json.NewDecoder(r.Body).Decode(&request); err != nil && err != io.EOF {
+			p.API.LogError("Failed to decode end request", "error", err)
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+	}
+
+	response, err := p.command.End(userID, request.ChannelID)
+	if err != nil {
+		p.API.LogError("Failed to end sick leave", "error", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	payload := endResponse{Message: response.Text}
+	if err := json.NewEncoder(w).Encode(payload); err != nil {
+		p.API.LogError("Failed to encode end response", "error", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
