@@ -59,6 +59,7 @@ func (p *Plugin) OnActivate() error {
 				HRChannelID:     settings.HRChannelID,
 				DefaultLocale:   settings.DefaultLocale,
 				MaxBackdateDays: settings.MaxBackdateDays,
+				ReportHashtag:   settings.ReportHashtag,
 			}
 		},
 		Bundle:    p.bundle,

@@ -28,8 +28,23 @@ func TestFormatInitialHRPostUsesMarkdownTable(t *testing.T) {
 func TestFormatFieldValuePostBlankLineBeforeTable(t *testing.T) {
 	t.Parallel()
 
-	message := formatFieldValuePost("Title", "Field", "Value", [][2]string{{"Key", "Value"}})
+	message := formatFieldValuePost("Title", "Field", "Value", "#krankmeldung", [][2]string{{"Key", "Value"}})
 	assert.Contains(t, message, "**Title**\n\n| Field | Value |")
+	assert.Contains(t, message, "\n\n#krankmeldung")
+}
+
+func TestFormatInitialHRPostIncludesHashtag(t *testing.T) {
+	t.Parallel()
+
+	bundle, err := i18n.NewBundle()
+	require.NoError(t, err)
+
+	message := FormatInitialHRPost(&Record{
+		StartDate: "2026-06-30",
+		Hashtag:   "#krankmeldung",
+	}, &model.User{Username: "markus"}, "en", bundle)
+
+	assert.Contains(t, message, "\n\n#krankmeldung")
 }
 
 func TestFormatCloseHRPostUsesMarkdownTable(t *testing.T) {

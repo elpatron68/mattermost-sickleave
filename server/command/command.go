@@ -19,6 +19,7 @@ type Settings struct {
 	HRChannelID     string
 	DefaultLocale   string
 	MaxBackdateDays int
+	ReportHashtag   string
 }
 
 type SettingsProvider func() Settings
@@ -363,6 +364,7 @@ func (h *Handler) SubmitStartDialog(request *model.SubmitDialogRequest) (*model.
 		StartDate:   rawStartDate,
 		Status:      sickleave.StatusReported,
 		HRChannelID: settings.HRChannelID,
+		Hashtag:     sickleave.NormalizeHashtag(settings.ReportHashtag),
 		History: []sickleave.HistoryEntry{{
 			Variant:   "A",
 			Timestamp: time.Now().UTC(),

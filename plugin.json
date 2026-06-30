@@ -51,6 +51,14 @@
                 "type": "number",
                 "default": 3,
                 "help_text": "How many days in the past the first sick day may be."
+            },
+            {
+                "key": "ReportHashtag",
+                "display_name": "Report Hashtag",
+                "type": "text",
+                "default": "#krankmeldung",
+                "help_text": "Hashtag appended to each sick leave post in the HR channel (e.g. #krankmeldung).",
+                "placeholder": "#krankmeldung"
             }
         ]
     }

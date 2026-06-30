@@ -27,5 +27,6 @@ type Record struct {
 	Status          Status         `json:"status"`
 	HRPostID        string         `json:"hr_post_id"`
 	HRChannelID     string         `json:"hr_channel_id"`
-	History         []HistoryEntry `json:"history"`
+	Hashtag           string         `json:"hashtag,omitempty"`
+	History           []HistoryEntry `json:"history"`
 }

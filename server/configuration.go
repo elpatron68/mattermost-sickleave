@@ -4,12 +4,15 @@ import (
 	"reflect"
 
 	"github.com/pkg/errors"
+
+	"github.com/elpatron68/mattermost-sickleave/server/sickleave"
 )
 
 type configuration struct {
 	HRChannelID     string
 	DefaultLocale   string
 	MaxBackdateDays int
+	ReportHashtag   string
 }
 
 func (c *configuration) Clone() *configuration {
@@ -25,6 +28,7 @@ func (p *Plugin) getConfiguration() *configuration {
 		return &configuration{
 			DefaultLocale:   "en",
 			MaxBackdateDays: 3,
+			ReportHashtag:   sickleave.DefaultReportHashtag,
 		}
 	}
 
@@ -50,6 +54,7 @@ func (p *Plugin) OnConfigurationChange() error {
 	configuration := &configuration{
 		DefaultLocale:   "en",
 		MaxBackdateDays: 3,
+		ReportHashtag:   sickleave.DefaultReportHashtag,
 	}
 
 	if err := p.API.LoadPluginConfiguration(configuration); err != nil {
@@ -62,6 +67,7 @@ func (p *Plugin) OnConfigurationChange() error {
 	if configuration.MaxBackdateDays <= 0 {
 		configuration.MaxBackdateDays = 3
 	}
+	configuration.ReportHashtag = sickleave.NormalizeHashtag(configuration.ReportHashtag)
 
 	p.setConfiguration(configuration)
 
@@ -74,6 +80,7 @@ func (p *Plugin) settingsFromConfig() commandSettings {
 		HRChannelID:     config.HRChannelID,
 		DefaultLocale:   config.DefaultLocale,
 		MaxBackdateDays: config.MaxBackdateDays,
+		ReportHashtag:   config.ReportHashtag,
 	}
 }
 
@@ -81,4 +88,5 @@ type commandSettings struct {
 	HRChannelID     string
 	DefaultLocale   string
 	MaxBackdateDays int
+	ReportHashtag   string
 }

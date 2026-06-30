@@ -8,6 +8,13 @@ import (
 	"github.com/mattermost/mattermost/server/public/model"
 )
 
+func recordHashtag(record *Record) string {
+	if record == nil || record.Hashtag == "" {
+		return DefaultReportHashtag
+	}
+	return record.Hashtag
+}
+
 func FormatInitialHRPost(record *Record, user *model.User, locale string, bundle *i18n.Bundle) string {
 	username := "unknown"
 	if user != nil {
@@ -18,6 +25,7 @@ func FormatInitialHRPost(record *Record, user *model.User, locale string, bundle
 		bundle.T(locale, "hr.post.a.title"),
 		bundle.T(locale, "hr.post.table.field"),
 		bundle.T(locale, "hr.post.table.value"),
+		recordHashtag(record),
 		[][2]string{
 		{bundle.T(locale, "hr.post.field.employee"), username},
 		{bundle.T(locale, "hr.post.field.first_sick_day"), record.StartDate},
@@ -30,6 +38,7 @@ func FormatUpdateHRPost(record *Record, expectedEnd string, auCertificate bool, 
 		bundle.T(locale, "hr.post.b.title"),
 		bundle.T(locale, "hr.post.table.field"),
 		bundle.T(locale, "hr.post.table.value"),
+		recordHashtag(record),
 		[][2]string{
 		{bundle.T(locale, "hr.post.field.expected_end"), expectedEnd},
 		{bundle.T(locale, "hr.post.field.au_certificate"), formatAUCertificate(auCertificate, locale, bundle)},
@@ -47,6 +56,7 @@ func FormatExtendHRPost(record *Record, newExpectedEnd string, auCertificate *bo
 		bundle.T(locale, "hr.post.c.title"),
 		bundle.T(locale, "hr.post.table.field"),
 		bundle.T(locale, "hr.post.table.value"),
+		recordHashtag(record),
 		[][2]string{
 		{bundle.T(locale, "hr.post.field.expected_end"), newExpectedEnd},
 		{bundle.T(locale, "hr.post.field.au_certificate"), auValue},
@@ -67,11 +77,12 @@ func FormatCloseHRPost(record *Record, locale string, bundle *i18n.Bundle) strin
 		bundle.T(locale, "hr.post.d.title"),
 		bundle.T(locale, "hr.post.table.field"),
 		bundle.T(locale, "hr.post.table.value"),
+		recordHashtag(record),
 		rows,
 	)
 }
 
-func formatFieldValuePost(title, fieldHeader, valueHeader string, rows [][2]string) string {
+func formatFieldValuePost(title, fieldHeader, valueHeader, hashtag string, rows [][2]string) string {
 	var b strings.Builder
 	b.WriteString("**")
 	b.WriteString(title)
@@ -82,6 +93,10 @@ func formatFieldValuePost(title, fieldHeader, valueHeader string, rows [][2]stri
 	b.WriteString(" |\n| :-- | :-- |\n")
 	for _, row := range rows {
 		fmt.Fprintf(&b, "| %s | %s |\n", row[0], row[1])
+	}
+	if hashtag != "" {
+		b.WriteString("\n\n")
+		b.WriteString(hashtag)
 	}
 	return strings.TrimRight(b.String(), "\n")
 }
