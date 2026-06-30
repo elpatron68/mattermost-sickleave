@@ -3,7 +3,6 @@
 Mattermost plugin for structured sick leave reporting (`Krankmeldung`) via slash commands, a channel header menu, and date-picker dialogs.
 
 **Plugin ID:** `de.medisoftware.mattermost-sickleave`
-
 ## Features
 
 - Slash commands: `start`, `update`, `extend`, `end`, `status`, `help` (default trigger: `/sick-leave`)
