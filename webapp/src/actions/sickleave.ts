@@ -186,9 +186,15 @@ export const submitSickLeaveModal = (payload: SubmitPayload) => async (dispatch:
     }
 };
 
-export function parseSickLeaveCommand(message: string): string | null {
+export function parseSickLeaveCommand(message: string, trigger = 'sick-leave'): string | null {
+    const normalized = trigger.replace(/^\//, '').trim();
+    if (!normalized) {
+        return null;
+    }
+
     const trimmed = message.trim();
-    const match = /^\/sick-leave(?:\s+(\S+))?$/i.exec(trimmed);
+    const pattern = new RegExp(`^/${normalized.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?:\\s+(\\S+))?$`, 'i');
+    const match = pattern.exec(trimmed);
     if (!match) {
         return null;
     }

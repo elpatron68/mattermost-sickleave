@@ -59,6 +59,14 @@
                 "default": "#krankmeldung",
                 "help_text": "Hashtag appended to each sick leave post in the HR channel (e.g. #krankmeldung).",
                 "placeholder": "#krankmeldung"
+            },
+            {
+                "key": "CommandTrigger",
+                "display_name": "Slash Command Trigger",
+                "type": "text",
+                "default": "sick-leave",
+                "help_text": "Slash command name without leading slash (e.g. krankmeldung or sick-leave).",
+                "placeholder": "krankmeldung"
             }
         ]
     }

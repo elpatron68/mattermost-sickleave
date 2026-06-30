@@ -14,4 +14,5 @@ export type ActiveRecord = {
 export type SickLeaveContext = {
     active?: ActiveRecord;
     max_backdate_days: number;
+    command_trigger: string;
 };

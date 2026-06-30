@@ -78,13 +78,16 @@ func setupTest(t *testing.T) (*env, *i18n.Bundle) {
 	}, bundle
 }
 
-func expectCommandRegistration(api *plugintest.API) {
+func expectCommandRegistration(api *plugintest.API, trigger string) {
+	if trigger == "" {
+		trigger = DefaultCommandTrigger
+	}
 	api.On("RegisterCommand", &model.Command{
-		Trigger:          commandTrigger,
+		Trigger:          trigger,
 		AutoComplete:     true,
 		AutoCompleteDesc: "Report and manage sick leave",
 		AutoCompleteHint: "[start|update|extend|end|status|help]",
-		AutocompleteData: buildAutocompleteData(),
+		AutocompleteData: buildAutocompleteData(trigger),
 	}).Return(nil)
 }
 
@@ -92,7 +95,10 @@ func newTestHandler(t *testing.T, store sickleave.Store, settings Settings, user
 	t.Helper()
 
 	testEnv, bundle := setupTest(t)
-	expectCommandRegistration(testEnv.api)
+	if settings.CommandTrigger == "" {
+		settings.CommandTrigger = DefaultCommandTrigger
+	}
+	expectCommandRegistration(testEnv.api, settings.CommandTrigger)
 	testEnv.api.On("GetUser", userID).Return(&model.User{Id: userID, Locale: "en"}, nil)
 
 	handler := NewCommandHandler(HandlerConfig{
@@ -106,21 +112,24 @@ func newTestHandler(t *testing.T, store sickleave.Store, settings Settings, user
 		BotUserID: "bot-1",
 	})
 
+	require.NoError(t, handler.EnsureSlashCommandRegistered())
+
 	return handler, testEnv
 }
 
 func TestHelpCommand(t *testing.T) {
 	env, bundle := setupTest(t)
-	expectCommandRegistration(env.api)
+	expectCommandRegistration(env.api, DefaultCommandTrigger)
 	env.api.On("GetUser", "").Return(&model.User{Locale: "en"}, nil)
 
 	handler := NewCommandHandler(HandlerConfig{
 		Client: env.client,
 		Settings: func() Settings {
-			return Settings{DefaultLocale: "en"}
+			return Settings{DefaultLocale: "en", CommandTrigger: DefaultCommandTrigger}
 		},
 		Bundle: bundle,
 	})
+	require.NoError(t, handler.EnsureSlashCommandRegistered())
 
 	response, err := handler.Handle(&model.CommandArgs{Command: "/sick-leave help"})
 	require.NoError(t, err)
@@ -131,7 +140,7 @@ func TestHelpCommand(t *testing.T) {
 
 func TestStartWithoutHRChannel(t *testing.T) {
 	env, bundle := setupTest(t)
-	expectCommandRegistration(env.api)
+	expectCommandRegistration(env.api, DefaultCommandTrigger)
 	env.api.On("GetUser", "user-1").Return(&model.User{
 		Id:     "user-1",
 		Locale: "en",
@@ -140,10 +149,11 @@ func TestStartWithoutHRChannel(t *testing.T) {
 	handler := NewCommandHandler(HandlerConfig{
 		Client: env.client,
 		Settings: func() Settings {
-			return Settings{DefaultLocale: "en"}
+			return Settings{DefaultLocale: "en", CommandTrigger: DefaultCommandTrigger}
 		},
 		Bundle: bundle,
 	})
+	require.NoError(t, handler.EnsureSlashCommandRegistered())
 
 	response, err := handler.Handle(&model.CommandArgs{
 		Command: "/sick-leave start",
@@ -209,7 +219,7 @@ func TestSubmitUpdateDialogTransitionsToUpdated(t *testing.T) {
 	}
 
 	env, bundle := setupTest(t)
-	expectCommandRegistration(env.api)
+	expectCommandRegistration(env.api, DefaultCommandTrigger)
 	env.api.On("GetUser", "user-1").Return(&model.User{Id: "user-1", Locale: "en"}, nil)
 	env.api.On("CreatePost", mockMatchedHRThreadPost("channel-hr", "post-root")).Return(&model.Post{Id: "post-update"}, nil).Once()
 	env.api.On("SendEphemeralPost", mock.Anything, mock.Anything).Return(&model.Post{})
@@ -259,7 +269,7 @@ func TestSubmitExtendDialogTransitionsToExtended(t *testing.T) {
 	}
 
 	env, bundle := setupTest(t)
-	expectCommandRegistration(env.api)
+	expectCommandRegistration(env.api, DefaultCommandTrigger)
 	env.api.On("GetUser", "user-1").Return(&model.User{Id: "user-1", Locale: "en"}, nil)
 	env.api.On("CreatePost", mockMatchedHRThreadPost("channel-hr", "post-root")).Return(&model.Post{Id: "post-extend"}, nil).Once()
 	env.api.On("SendEphemeralPost", mock.Anything, mock.Anything).Return(&model.Post{})
@@ -309,7 +319,7 @@ func TestSubmitExtendDialogRejectsNonExtensionDate(t *testing.T) {
 	}
 
 	env, bundle := setupTest(t)
-	expectCommandRegistration(env.api)
+	expectCommandRegistration(env.api, DefaultCommandTrigger)
 	env.api.On("GetUser", "user-1").Return(&model.User{Id: "user-1", Locale: "en"}, nil)
 
 	handler := NewCommandHandler(HandlerConfig{
@@ -347,7 +357,7 @@ func TestHandleEndClosesActiveCase(t *testing.T) {
 	}
 
 	env, bundle := setupTest(t)
-	expectCommandRegistration(env.api)
+	expectCommandRegistration(env.api, DefaultCommandTrigger)
 	env.api.On("GetUser", "user-1").Return(&model.User{Id: "user-1", Locale: "en"}, nil)
 	env.api.On("CreatePost", mockMatchedHRThreadPost("channel-hr", "post-root")).Return(&model.Post{Id: "post-close"}, nil).Once()
 

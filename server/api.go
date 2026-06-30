@@ -8,11 +8,14 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/mattermost/mattermost/server/public/model"
 	"github.com/mattermost/mattermost/server/public/plugin"
+
+	"github.com/elpatron68/mattermost-sickleave/server/command"
 )
 
 type sickLeaveContextResponse struct {
-	Active          any `json:"active,omitempty"`
-	MaxBackdateDays int `json:"max_backdate_days"`
+	Active          any    `json:"active,omitempty"`
+	MaxBackdateDays int    `json:"max_backdate_days"`
+	CommandTrigger  string `json:"command_trigger"`
 }
 
 func (p *Plugin) initRouter() *mux.Router {
@@ -62,6 +65,7 @@ func (p *Plugin) handleSickLeaveContext(w http.ResponseWriter, r *http.Request) 
 	response := sickLeaveContextResponse{
 		Active:          active,
 		MaxBackdateDays: maxBackdate,
+		CommandTrigger:  command.NormalizeCommandTrigger(settings.CommandTrigger),
 	}
 
 	w.Header().Set("Content-Type", "application/json")

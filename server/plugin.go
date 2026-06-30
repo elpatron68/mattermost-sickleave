@@ -60,6 +60,7 @@ func (p *Plugin) OnActivate() error {
 				DefaultLocale:   settings.DefaultLocale,
 				MaxBackdateDays: settings.MaxBackdateDays,
 				ReportHashtag:   settings.ReportHashtag,
+				CommandTrigger:  settings.CommandTrigger,
 			}
 		},
 		Bundle:    p.bundle,
@@ -69,6 +70,10 @@ func (p *Plugin) OnActivate() error {
 	})
 
 	p.router = p.initRouter()
+
+	if err := p.command.EnsureSlashCommandRegistered(); err != nil {
+		return errors.Wrap(err, "failed to register slash command")
+	}
 
 	return nil
 }

@@ -12,7 +12,10 @@ import type {GlobalState} from '@mattermost/types/store';
 import {confirmEndCase, endSickLeaveCase, openSickLeaveMenu, openSickLeaveModal, parseSickLeaveCommand} from 'actions/sickleave';
 import SickLeaveIcon from 'components/icons/sickleave';
 import Root from 'components/root';
+import {SET_SICK_LEAVE_CONTEXT} from 'action_types';
+import {fetchSickLeaveContext} from 'client';
 import reducer from 'reducer';
+import {sickLeaveCommandTrigger} from 'selectors';
 import type {PluginRegistry} from 'types/mattermost-webapp';
 
 import de from '../i18n/de.json';
@@ -39,6 +42,14 @@ export default class Plugin {
         registry.registerRootComponent(Root);
         registry.registerTranslations(getTranslationsForLocale);
 
+        fetchSickLeaveContext().
+            then((context) => {
+                store.dispatch({type: SET_SICK_LEAVE_CONTEXT, context});
+            }).
+            catch(() => {
+                // Keep default slash command trigger until context loads.
+            });
+
         registry.registerChannelHeaderButtonAction(
             <SickLeaveIcon/>,
             () => {
@@ -52,7 +63,8 @@ export default class Plugin {
         );
 
         registry.registerSlashCommandWillBePostedHook((message, args) => {
-            const subcommand = parseSickLeaveCommand(message);
+            const trigger = sickLeaveCommandTrigger(store.getState());
+            const subcommand = parseSickLeaveCommand(message, trigger);
             if (subcommand === 'start' || subcommand === 'update' || subcommand === 'extend') {
                 openSickLeaveModal(subcommand, args.channel_id, args.team_id)(store.dispatch, store.getState);
                 return {};

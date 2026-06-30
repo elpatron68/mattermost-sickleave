@@ -27,6 +27,10 @@ func (stubCommand) End(_ string, _ string) (*model.CommandResponse, error) {
 	return &model.CommandResponse{Text: "closed"}, nil
 }
 
+func (stubCommand) EnsureSlashCommandRegistered() error {
+	return nil
+}
+
 func TestDialogSubmitRoute(t *testing.T) {
 	plugin := Plugin{
 		command: stubCommand{},

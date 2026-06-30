@@ -13,32 +13,33 @@ import (
 	"github.com/mattermost/mattermost/server/public/pluginapi"
 )
 
-const commandTrigger = "sick-leave"
-
 type Settings struct {
 	HRChannelID     string
 	DefaultLocale   string
 	MaxBackdateDays int
 	ReportHashtag   string
+	CommandTrigger  string
 }
 
 type SettingsProvider func() Settings
 
 type Handler struct {
-	client       *pluginapi.Client
-	dialogAPI    dialog.DialogAPI
-	store        sickleave.Store
-	settings     SettingsProvider
-	bundle       *i18n.Bundle
-	pluginID     string
-	siteURL      func() (string, error)
-	botUserID    string
+	client            *pluginapi.Client
+	dialogAPI         dialog.DialogAPI
+	store             sickleave.Store
+	settings          SettingsProvider
+	bundle            *i18n.Bundle
+	pluginID          string
+	siteURL           func() (string, error)
+	botUserID         string
+	registeredTrigger string
 }
 
 type Command interface {
 	Handle(args *model.CommandArgs) (*model.CommandResponse, error)
 	SubmitDialog(request *model.SubmitDialogRequest) (*model.SubmitDialogResponse, error)
 	End(userID, channelID string) (*model.CommandResponse, error)
+	EnsureSlashCommandRegistered() error
 }
 
 type HandlerConfig struct {
@@ -53,17 +54,6 @@ type HandlerConfig struct {
 }
 
 func NewCommandHandler(cfg HandlerConfig) Command {
-	err := cfg.Client.SlashCommand.Register(&model.Command{
-		Trigger:          commandTrigger,
-		AutoComplete:     true,
-		AutoCompleteDesc: "Report and manage sick leave",
-		AutoCompleteHint: "[start|update|extend|end|status|help]",
-		AutocompleteData: buildAutocompleteData(),
-	})
-	if err != nil {
-		cfg.Client.Log.Error("Failed to register slash command", "error", err)
-	}
-
 	return &Handler{
 		client:    cfg.Client,
 		dialogAPI: cfg.DialogAPI,
@@ -76,8 +66,38 @@ func NewCommandHandler(cfg HandlerConfig) Command {
 	}
 }
 
-func buildAutocompleteData() *model.AutocompleteData {
-	root := model.NewAutocompleteData(commandTrigger, "[start|update|extend|end|status|help]", "Sick leave commands")
+func (h *Handler) EnsureSlashCommandRegistered() error {
+	trigger := h.commandTrigger()
+	if trigger == h.registeredTrigger {
+		return nil
+	}
+
+	if h.registeredTrigger != "" {
+		if err := h.client.SlashCommand.Unregister("", h.registeredTrigger); err != nil {
+			h.client.Log.Warn("Failed to unregister previous slash command", "trigger", h.registeredTrigger, "error", err)
+		}
+	}
+
+	if err := h.client.SlashCommand.Register(&model.Command{
+		Trigger:          trigger,
+		AutoComplete:     true,
+		AutoCompleteDesc: "Report and manage sick leave",
+		AutoCompleteHint: "[start|update|extend|end|status|help]",
+		AutocompleteData: buildAutocompleteData(trigger),
+	}); err != nil {
+		return err
+	}
+
+	h.registeredTrigger = trigger
+	return nil
+}
+
+func (h *Handler) commandTrigger() string {
+	return NormalizeCommandTrigger(h.settings().CommandTrigger)
+}
+
+func buildAutocompleteData(trigger string) *model.AutocompleteData {
+	root := model.NewAutocompleteData(trigger, "[start|update|extend|end|status|help]", "Sick leave commands")
 	root.AddCommand(model.NewAutocompleteData("start", "", "Report the first sick day"))
 	root.AddCommand(model.NewAutocompleteData("update", "", "Provide expected return date and AU status"))
 	root.AddCommand(model.NewAutocompleteData("extend", "", "Extend the expected return date"))
@@ -110,7 +130,7 @@ func (h *Handler) Handle(args *model.CommandArgs) (*model.CommandResponse, error
 	case "help":
 		return h.handleHelp(locale), nil
 	default:
-		return ephemeral(h.bundle.T(locale, "command.error.unknown_subcommand", subcommand)), nil
+		return ephemeral(h.bundle.T(locale, "command.error.unknown_subcommand", subcommand, h.commandTrigger())), nil
 	}
 }
 
@@ -125,7 +145,7 @@ func (h *Handler) handleStart(args *model.CommandArgs, locale string) (*model.Co
 		return nil, err
 	}
 	if active != nil {
-		return ephemeral(h.bundle.T(locale, "command.error.active_exists")), nil
+		return ephemeral(h.bundle.T(locale, "command.error.active_exists", h.commandTrigger())), nil
 	}
 
 	submitURL, err := h.dialogSubmitURL()
@@ -162,7 +182,7 @@ func (h *Handler) handleUpdate(args *model.CommandArgs, locale string) (*model.C
 		return ephemeral(h.bundle.T(locale, "command.error.no_active")), nil
 	}
 	if active.Status != sickleave.StatusReported {
-		return ephemeral(h.bundle.T(locale, "command.error.update_not_allowed")), nil
+		return ephemeral(h.bundle.T(locale, "command.error.update_not_allowed", h.commandTrigger())), nil
 	}
 
 	submitURL, err := h.dialogSubmitURL()
@@ -193,7 +213,7 @@ func (h *Handler) handleExtend(args *model.CommandArgs, locale string) (*model.C
 		return ephemeral(h.bundle.T(locale, "command.error.no_active")), nil
 	}
 	if active.Status != sickleave.StatusUpdated && active.Status != sickleave.StatusExtended {
-		return ephemeral(h.bundle.T(locale, "command.error.extend_not_allowed")), nil
+		return ephemeral(h.bundle.T(locale, "command.error.extend_not_allowed", h.commandTrigger())), nil
 	}
 
 	submitURL, err := h.dialogSubmitURL()
@@ -244,14 +264,15 @@ func (h *Handler) handleStatus(args *model.CommandArgs, locale string) *model.Co
 }
 
 func (h *Handler) handleHelp(locale string) *model.CommandResponse {
+	trigger := h.commandTrigger()
 	text := strings.Join([]string{
 		h.bundle.T(locale, "command.help.header"),
-		h.bundle.T(locale, "command.help.start"),
-		h.bundle.T(locale, "command.help.update"),
-		h.bundle.T(locale, "command.help.extend"),
-		h.bundle.T(locale, "command.help.end"),
-		h.bundle.T(locale, "command.help.status"),
-		h.bundle.T(locale, "command.help.help"),
+		h.bundle.T(locale, "command.help.start", trigger),
+		h.bundle.T(locale, "command.help.update", trigger),
+		h.bundle.T(locale, "command.help.extend", trigger),
+		h.bundle.T(locale, "command.help.end", trigger),
+		h.bundle.T(locale, "command.help.status", trigger),
+		h.bundle.T(locale, "command.help.help", trigger),
 	}, "\n")
 	return ephemeral(text)
 }
@@ -323,7 +344,7 @@ func (h *Handler) SubmitStartDialog(request *model.SubmitDialogRequest) (*model.
 		return nil, err
 	}
 	if active != nil {
-		return dialogError(locale, h.bundle, "command.error.active_exists"), nil
+		return dialogError(locale, h.bundle, "command.error.active_exists", h.commandTrigger()), nil
 	}
 
 	rawStartDate, ok := request.Submission["start_date"].(string)
@@ -409,7 +430,7 @@ func (h *Handler) SubmitUpdateDialog(request *model.SubmitDialogRequest) (*model
 		return dialogError(locale, h.bundle, "command.error.no_active"), nil
 	}
 	if active.Status != sickleave.StatusReported {
-		return dialogError(locale, h.bundle, "command.error.update_not_allowed"), nil
+		return dialogError(locale, h.bundle, "command.error.update_not_allowed", h.commandTrigger()), nil
 	}
 
 	rawExpectedEnd, ok := request.Submission["expected_end_date"].(string)
@@ -481,10 +502,10 @@ func (h *Handler) SubmitExtendDialog(request *model.SubmitDialogRequest) (*model
 		return dialogError(locale, h.bundle, "command.error.no_active"), nil
 	}
 	if active.Status != sickleave.StatusUpdated && active.Status != sickleave.StatusExtended {
-		return dialogError(locale, h.bundle, "command.error.extend_not_allowed"), nil
+		return dialogError(locale, h.bundle, "command.error.extend_not_allowed", h.commandTrigger()), nil
 	}
 	if active.ExpectedEndDate == "" {
-		return dialogError(locale, h.bundle, "command.error.extend_not_allowed"), nil
+		return dialogError(locale, h.bundle, "command.error.extend_not_allowed", h.commandTrigger()), nil
 	}
 
 	rawExpectedEnd, ok := request.Submission["expected_end_date"].(string)

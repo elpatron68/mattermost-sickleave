@@ -82,3 +82,7 @@ export function sickLeaveFieldErrors(state: GlobalState): Record<string, string>
 export function sickLeaveGeneralError(state: GlobalState): string {
     return getPluginState(state)?.generalError ?? '';
 }
+
+export function sickLeaveCommandTrigger(state: GlobalState): string {
+    return getPluginState(state)?.context?.command_trigger || 'sick-leave';
+}

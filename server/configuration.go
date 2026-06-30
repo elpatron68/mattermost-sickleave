@@ -5,6 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 
+	"github.com/elpatron68/mattermost-sickleave/server/command"
 	"github.com/elpatron68/mattermost-sickleave/server/sickleave"
 )
 
@@ -13,6 +14,7 @@ type configuration struct {
 	DefaultLocale   string
 	MaxBackdateDays int
 	ReportHashtag   string
+	CommandTrigger  string
 }
 
 func (c *configuration) Clone() *configuration {
@@ -29,6 +31,7 @@ func (p *Plugin) getConfiguration() *configuration {
 			DefaultLocale:   "en",
 			MaxBackdateDays: 3,
 			ReportHashtag:   sickleave.DefaultReportHashtag,
+			CommandTrigger:  command.DefaultCommandTrigger,
 		}
 	}
 
@@ -55,6 +58,7 @@ func (p *Plugin) OnConfigurationChange() error {
 		DefaultLocale:   "en",
 		MaxBackdateDays: 3,
 		ReportHashtag:   sickleave.DefaultReportHashtag,
+		CommandTrigger:  command.DefaultCommandTrigger,
 	}
 
 	if err := p.API.LoadPluginConfiguration(configuration); err != nil {
@@ -68,8 +72,15 @@ func (p *Plugin) OnConfigurationChange() error {
 		configuration.MaxBackdateDays = 3
 	}
 	configuration.ReportHashtag = sickleave.NormalizeHashtag(configuration.ReportHashtag)
+	configuration.CommandTrigger = command.NormalizeCommandTrigger(configuration.CommandTrigger)
 
 	p.setConfiguration(configuration)
+
+	if p.command != nil {
+		if err := p.command.EnsureSlashCommandRegistered(); err != nil {
+			return errors.Wrap(err, "failed to register slash command")
+		}
+	}
 
 	return nil
 }
@@ -81,6 +92,7 @@ func (p *Plugin) settingsFromConfig() commandSettings {
 		DefaultLocale:   config.DefaultLocale,
 		MaxBackdateDays: config.MaxBackdateDays,
 		ReportHashtag:   config.ReportHashtag,
+		CommandTrigger:  config.CommandTrigger,
 	}
 }
 
@@ -89,4 +101,5 @@ type commandSettings struct {
 	DefaultLocale   string
 	MaxBackdateDays int
 	ReportHashtag   string
+	CommandTrigger  string
 }
