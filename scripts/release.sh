@@ -32,8 +32,8 @@ Examples:
   scripts/release.sh -v 0.2.0 --dry-run
   scripts/release.sh -v 1.0.0 -y
 
-After push, GitHub Actions (CI workflow) runs on tag v<version> and builds the
-plugin bundle via the shared Mattermost plugin CI workflow.
+After push, GitHub Actions runs CI on the tag and the release workflow
+publishes dist/*.tar.gz to GitHub Releases.
 EOF
 }
 

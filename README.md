@@ -102,6 +102,10 @@ Bump version, update the changelog, commit, tag, and push:
 ./scripts/release.sh -v 0.1.2
 ```
 
+The **release** workflow (`.github/workflows/release.yml`) builds `make dist` and
+uploads the plugin `.tar.gz` to [GitHub Releases](https://github.com/elpatron68/mattermost-sickleave/releases).
+To backfill an existing tag, run the workflow manually (**Actions → release → Run workflow**).
+
 Options: `--dry-run`, `--no-push`, `-y`, `--unsigned`. The Makefile also provides `make patch`, `make minor`, and `make major` for signed git tags without updating `plugin.json`.
 
 ## Project layout
