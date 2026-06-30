@@ -4,9 +4,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/medisoftware/mattermost-sickleave/server/i18n"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/medisoftware/mattermost-sickleave/server/i18n"
 )
 
 func TestBuildStartDialogUsesDatePickerWithBounds(t *testing.T) {

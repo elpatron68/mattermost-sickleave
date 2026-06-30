@@ -4,10 +4,11 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/medisoftware/mattermost-sickleave/server/i18n"
 	"github.com/mattermost/mattermost/server/public/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/medisoftware/mattermost-sickleave/server/i18n"
 )
 
 func TestFormatInitialHRPostUsesMarkdownTable(t *testing.T) {

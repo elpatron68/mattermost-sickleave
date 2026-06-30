@@ -3,15 +3,16 @@ package command
 import (
 	"testing"
 
-	"github.com/medisoftware/mattermost-sickleave/server/dialog"
-	"github.com/medisoftware/mattermost-sickleave/server/i18n"
-	"github.com/medisoftware/mattermost-sickleave/server/sickleave"
 	"github.com/mattermost/mattermost/server/public/model"
 	"github.com/mattermost/mattermost/server/public/plugin/plugintest"
 	"github.com/mattermost/mattermost/server/public/pluginapi"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
+
+	"github.com/medisoftware/mattermost-sickleave/server/dialog"
+	"github.com/medisoftware/mattermost-sickleave/server/i18n"
+	"github.com/medisoftware/mattermost-sickleave/server/sickleave"
 )
 
 type env struct {

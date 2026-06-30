@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/medisoftware/mattermost-sickleave/server/i18n"
 	"github.com/mattermost/mattermost/server/public/model"
+
+	"github.com/medisoftware/mattermost-sickleave/server/i18n"
 )
 
 func recordHashtag(record *Record) string {
@@ -27,10 +28,10 @@ func FormatInitialHRPost(record *Record, user *model.User, locale string, bundle
 		bundle.T(locale, "hr.post.table.value"),
 		recordHashtag(record),
 		[][2]string{
-		{bundle.T(locale, "hr.post.field.employee"), username},
-		{bundle.T(locale, "hr.post.field.first_sick_day"), record.StartDate},
-		{bundle.T(locale, "hr.post.field.status"), bundle.T(locale, "command.status.reported")},
-	})
+			{bundle.T(locale, "hr.post.field.employee"), username},
+			{bundle.T(locale, "hr.post.field.first_sick_day"), record.StartDate},
+			{bundle.T(locale, "hr.post.field.status"), bundle.T(locale, "command.status.reported")},
+		})
 }
 
 func FormatUpdateHRPost(record *Record, expectedEnd string, auCertificate bool, locale string, bundle *i18n.Bundle) string {
@@ -40,10 +41,10 @@ func FormatUpdateHRPost(record *Record, expectedEnd string, auCertificate bool, 
 		bundle.T(locale, "hr.post.table.value"),
 		recordHashtag(record),
 		[][2]string{
-		{bundle.T(locale, "hr.post.field.expected_end"), expectedEnd},
-		{bundle.T(locale, "hr.post.field.au_certificate"), formatAUCertificate(auCertificate, locale, bundle)},
-		{bundle.T(locale, "hr.post.field.status"), bundle.T(locale, "command.status.updated")},
-	})
+			{bundle.T(locale, "hr.post.field.expected_end"), expectedEnd},
+			{bundle.T(locale, "hr.post.field.au_certificate"), formatAUCertificate(auCertificate, locale, bundle)},
+			{bundle.T(locale, "hr.post.field.status"), bundle.T(locale, "command.status.updated")},
+		})
 }
 
 func FormatExtendHRPost(record *Record, newExpectedEnd string, auCertificate *bool, locale string, bundle *i18n.Bundle) string {
@@ -58,10 +59,10 @@ func FormatExtendHRPost(record *Record, newExpectedEnd string, auCertificate *bo
 		bundle.T(locale, "hr.post.table.value"),
 		recordHashtag(record),
 		[][2]string{
-		{bundle.T(locale, "hr.post.field.expected_end"), newExpectedEnd},
-		{bundle.T(locale, "hr.post.field.au_certificate"), auValue},
-		{bundle.T(locale, "hr.post.field.status"), bundle.T(locale, "command.status.extended")},
-	})
+			{bundle.T(locale, "hr.post.field.expected_end"), newExpectedEnd},
+			{bundle.T(locale, "hr.post.field.au_certificate"), auValue},
+			{bundle.T(locale, "hr.post.field.status"), bundle.T(locale, "command.status.extended")},
+		})
 }
 
 func FormatCloseHRPost(record *Record, locale string, bundle *i18n.Bundle) string {

@@ -3,8 +3,9 @@ package dialog
 import (
 	"time"
 
-	"github.com/medisoftware/mattermost-sickleave/server/i18n"
 	"github.com/mattermost/mattermost/server/public/model"
+
+	"github.com/medisoftware/mattermost-sickleave/server/i18n"
 )
 
 const (

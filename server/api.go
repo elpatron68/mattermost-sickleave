@@ -84,7 +84,7 @@ func (p *Plugin) handleDialogSubmit(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var request model.SubmitDialogRequest
-	if err := json.Unmarshal(body, &request); err != nil {
+	if err = json.Unmarshal(body, &request); err != nil {
 		p.API.LogError("Failed to decode dialog submission", "error", err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

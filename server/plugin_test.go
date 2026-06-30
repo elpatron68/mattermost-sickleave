@@ -7,10 +7,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/medisoftware/mattermost-sickleave/server/dialog"
 	"github.com/mattermost/mattermost/server/public/model"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/medisoftware/mattermost-sickleave/server/dialog"
 )
 
 type stubCommand struct{}

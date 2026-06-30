@@ -5,12 +5,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/medisoftware/mattermost-sickleave/server/dialog"
-	"github.com/medisoftware/mattermost-sickleave/server/i18n"
-	"github.com/medisoftware/mattermost-sickleave/server/sickleave"
 	"github.com/google/uuid"
 	"github.com/mattermost/mattermost/server/public/model"
 	"github.com/mattermost/mattermost/server/public/pluginapi"
+
+	"github.com/medisoftware/mattermost-sickleave/server/dialog"
+	"github.com/medisoftware/mattermost-sickleave/server/i18n"
+	"github.com/medisoftware/mattermost-sickleave/server/sickleave"
 )
 
 type Settings struct {
@@ -362,7 +363,7 @@ func (h *Handler) SubmitStartDialog(request *model.SubmitDialogRequest) (*model.
 		maxBackdate = 3
 	}
 
-	if err := sickleave.ValidateStartDate(startDate, time.Now().UTC(), maxBackdate); err != nil {
+	if err = sickleave.ValidateStartDate(startDate, time.Now().UTC(), maxBackdate); err != nil {
 		switch err.Error() {
 		case "start date is in the future":
 			return dialogFieldError(locale, h.bundle, "start_date", "dialog.error.start_date_future"), nil
