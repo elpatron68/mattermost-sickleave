@@ -1,75 +1,75 @@
 {
-    "id": "de.medisoftware.mattermost-sickleave",
-    "name": "Sick Leave",
-    "version": "0.1.1",
-    "description": "Report sick leave via slash command and interactive dialogs.",
-    "homepage_url": "https://github.com/elpatron68/mattermost-sickleave",
-    "support_url": "https://github.com/elpatron68/mattermost-sickleave/issues",
-    "release_notes_url": "https://github.com/elpatron68/mattermost-sickleave/releases/tag/v0.1.1",
-    "icon_path": "assets/starter-template-icon.svg",
-    "min_server_version": "6.2.1",
-    "server": {
-        "executables": {
-            "linux-amd64": "server/dist/plugin-linux-amd64",
-            "linux-arm64": "server/dist/plugin-linux-arm64",
-            "darwin-amd64": "server/dist/plugin-darwin-amd64",
-            "darwin-arm64": "server/dist/plugin-darwin-arm64",
-            "windows-amd64": "server/dist/plugin-windows-amd64.exe"
-        }
-    },
-    "webapp": {
-        "bundle_path": "webapp/dist/main.js"
-    },
-    "settings_schema": {
-        "header": "Configure where sick leave reports are posted and validation rules.",
-        "footer": "",
-        "settings": [
-            {
-                "key": "HRChannelID",
-                "display_name": "HR Channel ID",
-                "type": "text",
-                "help_text": "The channel ID where sick leave reports are posted (private HR channel recommended).",
-                "placeholder": ""
-            },
-            {
-                "key": "DefaultLocale",
-                "display_name": "Default Locale",
-                "type": "dropdown",
-                "default": "en",
-                "options": [
-                    {
-                        "display_name": "English",
-                        "value": "en"
-                    },
-                    {
-                        "display_name": "Deutsch",
-                        "value": "de"
-                    }
-                ]
-            },
-            {
-                "key": "MaxBackdateDays",
-                "display_name": "Maximum Backdate Days",
-                "type": "number",
-                "default": 3,
-                "help_text": "How many days in the past the first sick day may be."
-            },
-            {
-                "key": "ReportHashtag",
-                "display_name": "Report Hashtag",
-                "type": "text",
-                "default": "#krankmeldung",
-                "help_text": "Hashtag appended to each sick leave post in the HR channel (e.g. #krankmeldung).",
-                "placeholder": "#krankmeldung"
-            },
-            {
-                "key": "CommandTrigger",
-                "display_name": "Slash Command Trigger",
-                "type": "text",
-                "default": "sick-leave",
-                "help_text": "Slash command name without leading slash (e.g. krankmeldung or sick-leave).",
-                "placeholder": "krankmeldung"
-            }
-        ]
+  "id": "de.medisoftware.mattermost-sickleave",
+  "name": "Sick Leave",
+  "version": "0.1.2",
+  "description": "Report sick leave via slash command and interactive dialogs.",
+  "homepage_url": "https://github.com/elpatron68/mattermost-sickleave",
+  "support_url": "https://github.com/elpatron68/mattermost-sickleave/issues",
+  "release_notes_url": "https://github.com/elpatron68/mattermost-sickleave/releases/tag/v0.1.2",
+  "icon_path": "assets/starter-template-icon.svg",
+  "min_server_version": "6.2.1",
+  "server": {
+    "executables": {
+      "linux-amd64": "server/dist/plugin-linux-amd64",
+      "linux-arm64": "server/dist/plugin-linux-arm64",
+      "darwin-amd64": "server/dist/plugin-darwin-amd64",
+      "darwin-arm64": "server/dist/plugin-darwin-arm64",
+      "windows-amd64": "server/dist/plugin-windows-amd64.exe"
     }
+  },
+  "webapp": {
+    "bundle_path": "webapp/dist/main.js"
+  },
+  "settings_schema": {
+    "header": "Configure where sick leave reports are posted and validation rules.",
+    "footer": "",
+    "settings": [
+      {
+        "key": "HRChannelID",
+        "display_name": "HR Channel ID",
+        "type": "text",
+        "help_text": "The channel ID where sick leave reports are posted (private HR channel recommended).",
+        "placeholder": ""
+      },
+      {
+        "key": "DefaultLocale",
+        "display_name": "Default Locale",
+        "type": "dropdown",
+        "default": "en",
+        "options": [
+          {
+            "display_name": "English",
+            "value": "en"
+          },
+          {
+            "display_name": "Deutsch",
+            "value": "de"
+          }
+        ]
+      },
+      {
+        "key": "MaxBackdateDays",
+        "display_name": "Maximum Backdate Days",
+        "type": "number",
+        "default": 3,
+        "help_text": "How many days in the past the first sick day may be."
+      },
+      {
+        "key": "ReportHashtag",
+        "display_name": "Report Hashtag",
+        "type": "text",
+        "default": "#krankmeldung",
+        "help_text": "Hashtag appended to each sick leave post in the HR channel (e.g. #krankmeldung).",
+        "placeholder": "#krankmeldung"
+      },
+      {
+        "key": "CommandTrigger",
+        "display_name": "Slash Command Trigger",
+        "type": "text",
+        "default": "sick-leave",
+        "help_text": "Slash command name without leading slash (e.g. krankmeldung or sick-leave).",
+        "placeholder": "krankmeldung"
+      }
+    ]
+  }
 }
