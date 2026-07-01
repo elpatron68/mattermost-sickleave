@@ -1,7 +1,7 @@
 {
   "id": "de.medisoftware.mattermost-sickleave",
   "name": "Sick Leave",
-  "version": "0.1.4.1",
+  "version": "0.1.4+1",
   "description": "Report sick leave via slash command and interactive dialogs.",
   "homepage_url": "https://github.com/elpatron68/mattermost-sickleave",
   "support_url": "https://github.com/elpatron68/mattermost-sickleave/issues",

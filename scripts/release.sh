@@ -19,6 +19,10 @@ Usage: scripts/release.sh -v <version> [options]
 Prepare a release: bump plugin.json, update CHANGELOG.md, run make apply
 (for local/CI builds), commit, create tag v<version>, and push to origin.
 
+Four-segment versions (e.g. 0.1.3.1) are used for git tags and CHANGELOG.
+plugin.json gets a semver-compatible form (0.1.3.1 -> 0.1.3+1) because Mattermost
+requires strict semver in the plugin manifest.
+
 Options:
   -v, --version <x.y.z[.w]>   Release version (required, e.g. 0.2.0 or 0.1.3.1)
   -y, --yes               Skip confirmation prompt
@@ -67,6 +71,23 @@ validate_version() {
 	local version="$1"
 	[[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?(-rc[0-9]+)?$ ]] \
 		|| die "invalid version '$version' (expected e.g. 0.2.0 or 0.1.3.1)"
+}
+
+# Mattermost manifest validation requires semver; map x.y.z.w to x.y.z+w.
+plugin_json_version() {
+	local version="$1"
+	if [[ "$version" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)\.([0-9]+)(-rc[0-9]+)?$ ]]; then
+		local base="${BASH_REMATCH[1]}.${BASH_REMATCH[2]}.${BASH_REMATCH[3]}"
+		local build="${BASH_REMATCH[4]}"
+		local rc="${BASH_REMATCH[5]:-}"
+		if [[ -n "$rc" ]]; then
+			printf '%s%s+%s' "$base" "$rc" "$build"
+		else
+			printf '%s+%s' "$base" "$build"
+		fi
+	else
+		printf '%s' "$version"
+	fi
 }
 
 parse_args() {
@@ -142,12 +163,13 @@ assert_preconditions() {
 }
 
 update_plugin_json() {
-	local repo_url notes_url tmp
+	local repo_url notes_url plugin_version tmp
 	repo_url="$(github_repo_url)"
 	notes_url="${repo_url}/releases/tag/v${VERSION}"
+	plugin_version="$(plugin_json_version "$VERSION")"
 	tmp="$(mktemp)"
 
-	jq --arg version "$VERSION" --arg notes_url "$notes_url" \
+	jq --arg version "$plugin_version" --arg notes_url "$notes_url" \
 		'.version = $version | .release_notes_url = $notes_url' \
 		plugin.json >"$tmp"
 	mv "$tmp" plugin.json
@@ -251,11 +273,12 @@ main() {
 	assert_preconditions
 
 	current="$(jq -r .version plugin.json)"
-	if [[ "$current" == "$VERSION" ]]; then
-		die "plugin.json already has version $VERSION"
+	expected="$(plugin_json_version "$VERSION")"
+	if [[ "$current" == "$expected" ]]; then
+		die "plugin.json already has version $expected"
 	fi
 
-	log "Release v${VERSION} (current plugin.json version: ${current})"
+	log "Release v${VERSION} (plugin.json version: ${expected}, current: ${current})"
 	if [[ "$ASSUME_YES" == false && "$DRY_RUN" == false ]]; then
 		printf 'Proceed with release preparation and push? [y/N] '
 		read -r reply
@@ -263,7 +286,7 @@ main() {
 	fi
 
 	if [[ "$DRY_RUN" == true ]]; then
-		log "[dry-run] would set plugin.json version to $VERSION"
+		log "[dry-run] would set plugin.json version to $(plugin_json_version "$VERSION") (release v${VERSION})"
 		log "[dry-run] would move CHANGELOG [Unreleased] entries to [$VERSION]"
 		log "[dry-run] would run: make apply"
 		log "[dry-run] would git add plugin.json CHANGELOG.md"
