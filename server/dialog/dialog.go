@@ -6,6 +6,7 @@ import (
 	"github.com/mattermost/mattermost/server/public/model"
 
 	"github.com/medisoftware/mattermost-sickleave/server/i18n"
+	"github.com/medisoftware/mattermost-sickleave/server/sickleave"
 )
 
 const (
@@ -41,11 +42,6 @@ func formatDate(value time.Time) string {
 
 func BuildStartDialog(locale string, bundle *i18n.Bundle, opts StartDialogOptions) model.Dialog {
 	today := truncateToDate(opts.Today.UTC())
-	maxBackdate := opts.MaxBackdateDays
-	if maxBackdate <= 0 {
-		maxBackdate = 3
-	}
-	minDate := today.AddDate(0, 0, -maxBackdate)
 
 	return model.Dialog{
 		CallbackId:       CallbackStart,
@@ -57,11 +53,10 @@ func BuildStartDialog(locale string, bundle *i18n.Bundle, opts StartDialogOption
 		Elements: []model.DialogElement{{
 			DisplayName: bundle.T(locale, "dialog.a.start_date"),
 			Name:        "start_date",
-			Type:        "date",
+			Type:        "text",
+			Default:     sickleave.FormatDateForLocale(formatDate(today), locale),
 			Placeholder: bundle.T(locale, "dialog.date_placeholder"),
 			HelpText:    bundle.T(locale, "dialog.a.start_date_help"),
-			MinDate:     formatDate(minDate),
-			MaxDate:     formatDate(today),
 		}},
 	}
 }
@@ -78,10 +73,9 @@ func BuildUpdateDialog(locale string, bundle *i18n.Bundle, opts UpdateDialogOpti
 			{
 				DisplayName: bundle.T(locale, "dialog.b.expected_end"),
 				Name:        "expected_end_date",
-				Type:        "date",
+				Type:        "text",
 				Placeholder: bundle.T(locale, "dialog.date_placeholder"),
 				HelpText:    bundle.T(locale, "dialog.b.expected_end_help"),
-				MinDate:     opts.StartDate,
 			},
 			{
 				DisplayName: bundle.T(locale, "dialog.b.au_certificate"),
@@ -99,11 +93,6 @@ func BuildUpdateDialog(locale string, bundle *i18n.Bundle, opts UpdateDialogOpti
 }
 
 func BuildExtendDialog(locale string, bundle *i18n.Bundle, opts ExtendDialogOptions) model.Dialog {
-	minDate := opts.CurrentExpectedEnd
-	if parsed, err := time.Parse(dateLayout, opts.CurrentExpectedEnd); err == nil {
-		minDate = formatDate(parsed.AddDate(0, 0, 1))
-	}
-
 	return model.Dialog{
 		CallbackId:       CallbackExtend,
 		Title:            bundle.T(locale, "dialog.c.title"),
@@ -115,10 +104,9 @@ func BuildExtendDialog(locale string, bundle *i18n.Bundle, opts ExtendDialogOpti
 			{
 				DisplayName: bundle.T(locale, "dialog.c.expected_end"),
 				Name:        "expected_end_date",
-				Type:        "date",
+				Type:        "text",
 				Placeholder: bundle.T(locale, "dialog.date_placeholder"),
 				HelpText:    bundle.T(locale, "dialog.c.expected_end_help"),
-				MinDate:     minDate,
 			},
 			{
 				DisplayName: bundle.T(locale, "dialog.c.au_certificate"),
