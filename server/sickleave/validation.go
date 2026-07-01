@@ -5,8 +5,6 @@ import (
 	"time"
 )
 
-var dateLayout = isoDateLayout
-
 func ParseDate(value string) (time.Time, error) {
 	return ParseDateForLocale(value, "en")
 }
