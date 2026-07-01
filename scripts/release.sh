@@ -20,7 +20,7 @@ Prepare a release: bump plugin.json, update CHANGELOG.md, run make apply
 (for local/CI builds), commit, create tag v<version>, and push to origin.
 
 Options:
-  -v, --version <x.y.z>   Release version (required, semver)
+  -v, --version <x.y.z[.w]>   Release version (required, e.g. 0.2.0 or 0.1.3.1)
   -y, --yes               Skip confirmation prompt
       --dry-run           Show planned actions without changing files
       --no-push           Commit and tag locally only
@@ -29,6 +29,7 @@ Options:
 
 Examples:
   scripts/release.sh -v 0.2.0
+  scripts/release.sh -v 0.1.3.1
   scripts/release.sh -v 0.2.0 --dry-run
   scripts/release.sh -v 1.0.0 -y
 
@@ -64,8 +65,8 @@ github_repo_url() {
 
 validate_version() {
 	local version="$1"
-	[[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(-rc[0-9]+)?$ ]] \
-		|| die "invalid version '$version' (expected semver, e.g. 0.2.0)"
+	[[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?(-rc[0-9]+)?$ ]] \
+		|| die "invalid version '$version' (expected e.g. 0.2.0 or 0.1.3.1)"
 }
 
 parse_args() {
@@ -107,7 +108,7 @@ parse_args() {
 		esac
 	done
 
-	[[ -n "$VERSION" ]] || die "version is required (-v <x.y.z>)"
+	[[ -n "$VERSION" ]] || die "version is required (-v <x.y.z[.w]>)"
 	validate_version "$VERSION"
 }
 

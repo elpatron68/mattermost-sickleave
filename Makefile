@@ -28,7 +28,7 @@ include build/setup.mk
 
 # Append commit hash to bundle name for untagged dev builds.
 BUILD_HASH_SHORT ?= $(shell git rev-parse --short HEAD 2>/dev/null)
-GIT_RELEASE_TAG_AT_HEAD := $(strip $(shell git tag --points-at HEAD 2>/dev/null | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+(-rc[0-9]+)?$$' | head -1))
+GIT_RELEASE_TAG_AT_HEAD := $(strip $(shell git tag --points-at HEAD 2>/dev/null | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?(-rc[0-9]+)?$$' | head -1))
 ifeq ($(GIT_RELEASE_TAG_AT_HEAD),)
 ifneq ($(BUILD_HASH_SHORT),)
 BUNDLE_VERSION := $(PLUGIN_VERSION)+$(BUILD_HASH_SHORT)
