@@ -3,6 +3,7 @@
 
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
+import {formatDateForLocale} from 'utils';
 import {getAvailableMenuActions} from 'utils/menu';
 
 import {changeOpacity} from 'mattermost-redux/utils/theme_utils';
@@ -14,6 +15,7 @@ import './sick_leave_menu.css';
 type Props = {
     visible: boolean;
     context: SickLeaveContext | null;
+    locale: string;
     loading: boolean;
     ending: boolean;
     error: string;
@@ -83,13 +85,14 @@ export default class SickLeaveMenu extends React.PureComponent<Props> {
         }
 
         const active = context.active;
+        const startDate = formatDateForLocale(active.start_date, this.props.locale);
         if (!active.expected_end_date) {
             return (
                 <p className='sickleave-menu__status'>
                     <FormattedMessage
                         id='menu.status.active'
                         defaultMessage='Active sick leave since {startDate}. Status: {status}.'
-                        values={{startDate: active.start_date, status: active.status}}
+                        values={{startDate, status: active.status}}
                     />
                 </p>
             );
@@ -101,8 +104,8 @@ export default class SickLeaveMenu extends React.PureComponent<Props> {
                     id='menu.status.active_with_end'
                     defaultMessage='Active sick leave since {startDate}, expected return {endDate}. Status: {status}.'
                     values={{
-                        startDate: active.start_date,
-                        endDate: active.expected_end_date,
+                        startDate,
+                        endDate: formatDateForLocale(active.expected_end_date, this.props.locale),
                         status: active.status,
                     }}
                 />

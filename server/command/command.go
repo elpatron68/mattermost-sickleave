@@ -233,7 +233,10 @@ func (h *Handler) handleStatus(args *model.CommandArgs, locale string) *model.Co
 
 	statusLabel := h.statusLabel(locale, record.Status)
 	if record.ExpectedEndDate == "" {
-		return ephemeral(h.bundle.T(locale, "command.status.active", record.StartDate, statusLabel))
+		return ephemeral(h.bundle.T(locale, "command.status.active",
+			sickleave.FormatDateForLocale(record.StartDate, locale),
+			statusLabel,
+		))
 	}
 
 	auLabel := h.bundle.T(locale, "hr.post.au.unchanged")
@@ -248,8 +251,8 @@ func (h *Handler) handleStatus(args *model.CommandArgs, locale string) *model.Co
 	return ephemeral(h.bundle.T(
 		locale,
 		"command.status.active_with_end",
-		record.StartDate,
-		record.ExpectedEndDate,
+		sickleave.FormatDateForLocale(record.StartDate, locale),
+		sickleave.FormatDateForLocale(record.ExpectedEndDate, locale),
 		auLabel,
 		statusLabel,
 	))
@@ -342,10 +345,11 @@ func (h *Handler) SubmitStartDialog(request *model.SubmitDialogRequest) (*model.
 		return dialogFieldError(locale, h.bundle, "start_date", "dialog.error.start_date_required"), nil
 	}
 
-	startDate, err := sickleave.ParseDate(rawStartDate)
+	startDate, err := sickleave.ParseDateForLocale(rawStartDate, locale)
 	if err != nil {
 		return dialogFieldError(locale, h.bundle, "start_date", "dialog.error.start_date_invalid"), nil
 	}
+	rawStartDate = sickleave.FormatISODate(startDate)
 
 	maxBackdate := settings.MaxBackdateDays
 	if maxBackdate <= 0 {
@@ -428,10 +432,11 @@ func (h *Handler) SubmitUpdateDialog(request *model.SubmitDialogRequest) (*model
 		return dialogFieldError(locale, h.bundle, "expected_end_date", "dialog.error.expected_end_required"), nil
 	}
 
-	expectedEnd, err := sickleave.ParseDate(rawExpectedEnd)
+	expectedEnd, err := sickleave.ParseDateForLocale(rawExpectedEnd, locale)
 	if err != nil {
 		return dialogFieldError(locale, h.bundle, "expected_end_date", "dialog.error.expected_end_invalid"), nil
 	}
+	rawExpectedEnd = sickleave.FormatISODate(expectedEnd)
 
 	startDate, err := sickleave.ParseDate(active.StartDate)
 	if err != nil {
@@ -503,10 +508,11 @@ func (h *Handler) SubmitExtendDialog(request *model.SubmitDialogRequest) (*model
 		return dialogFieldError(locale, h.bundle, "expected_end_date", "dialog.error.expected_end_required"), nil
 	}
 
-	newExpectedEnd, err := sickleave.ParseDate(rawExpectedEnd)
+	newExpectedEnd, err := sickleave.ParseDateForLocale(rawExpectedEnd, locale)
 	if err != nil {
 		return dialogFieldError(locale, h.bundle, "expected_end_date", "dialog.error.expected_end_invalid"), nil
 	}
+	rawExpectedEnd = sickleave.FormatISODate(newExpectedEnd)
 
 	currentExpectedEnd, err := sickleave.ParseDate(active.ExpectedEndDate)
 	if err != nil {

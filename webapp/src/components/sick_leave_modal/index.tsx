@@ -7,6 +7,7 @@ import {bindActionCreators, type Dispatch} from 'redux';
 import type {GlobalState} from '@mattermost/types/store';
 
 import {getTheme} from 'mattermost-redux/selectors/entities/preferences';
+import {getCurrentUserLocale} from 'mattermost-redux/selectors/entities/i18n';
 
 import {closeSickLeaveModal, submitSickLeaveModal} from 'actions/sickleave';
 import {
@@ -24,6 +25,7 @@ function mapStateToProps(state: GlobalState) {
     return {
         visible: isSickLeaveModalVisible(state),
         variant: sickLeaveVariant(state),
+        locale: getCurrentUserLocale(state),
         context: sickLeaveContext(state),
         submitting: sickLeaveSubmitting(state),
         fieldErrors: sickLeaveFieldErrors(state),

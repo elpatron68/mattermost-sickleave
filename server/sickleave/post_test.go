@@ -22,7 +22,7 @@ func TestFormatInitialHRPostUsesMarkdownTable(t *testing.T) {
 	assert.True(t, strings.HasPrefix(message, "**Sick leave — Initial report**\n\n"))
 	assert.Contains(t, message, "| Field | Value |")
 	assert.Contains(t, message, "| Employee | @markus |")
-	assert.Contains(t, message, "| First sick day | 2026-06-30 |")
+	assert.Contains(t, message, "| First sick day | 06/30/2026 |")
 	assert.NotContains(t, message, "|\n|---|")
 }
 
@@ -61,7 +61,7 @@ func TestFormatCloseHRPostUsesMarkdownTable(t *testing.T) {
 	}, "en", bundle)
 
 	assert.True(t, strings.HasPrefix(message, "**Sick leave — Case closed**\n\n"))
-	assert.Contains(t, message, "| Expected return | 2026-06-25 |")
-	assert.Contains(t, message, "| First sick day | 2026-06-20 |")
+	assert.Contains(t, message, "| Expected return | 06/25/2026 |")
+	assert.Contains(t, message, "| First sick day | 06/20/2026 |")
 	assert.Contains(t, message, "| Status | Case closed |")
 }

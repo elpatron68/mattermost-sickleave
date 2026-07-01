@@ -14,6 +14,7 @@ import './sick_leave_modal.css';
 type Props = {
     visible: boolean;
     variant: SickLeaveVariant | '';
+    locale: string;
     context: SickLeaveContext | null;
     submitting: boolean;
     fieldErrors: Record<string, string>;
@@ -121,6 +122,7 @@ export default class SickLeaveModal extends React.PureComponent<Props, State> {
                     id={id}
                     className='sickleave-modal__date'
                     type='date'
+                    lang={this.props.locale}
                     value={value}
                     min={bounds.minDate}
                     max={bounds.maxDate}

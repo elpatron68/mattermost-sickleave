@@ -29,7 +29,7 @@ func FormatInitialHRPost(record *Record, user *model.User, locale string, bundle
 		recordHashtag(record),
 		[][2]string{
 			{bundle.T(locale, "hr.post.field.employee"), username},
-			{bundle.T(locale, "hr.post.field.first_sick_day"), record.StartDate},
+			{bundle.T(locale, "hr.post.field.first_sick_day"), FormatDateForLocale(record.StartDate, locale)},
 			{bundle.T(locale, "hr.post.field.status"), bundle.T(locale, "command.status.reported")},
 		})
 }
@@ -41,7 +41,7 @@ func FormatUpdateHRPost(record *Record, expectedEnd string, auCertificate bool, 
 		bundle.T(locale, "hr.post.table.value"),
 		recordHashtag(record),
 		[][2]string{
-			{bundle.T(locale, "hr.post.field.expected_end"), expectedEnd},
+			{bundle.T(locale, "hr.post.field.expected_end"), FormatDateForLocale(expectedEnd, locale)},
 			{bundle.T(locale, "hr.post.field.au_certificate"), formatAUCertificate(auCertificate, locale, bundle)},
 			{bundle.T(locale, "hr.post.field.status"), bundle.T(locale, "command.status.updated")},
 		})
@@ -59,7 +59,7 @@ func FormatExtendHRPost(record *Record, newExpectedEnd string, auCertificate *bo
 		bundle.T(locale, "hr.post.table.value"),
 		recordHashtag(record),
 		[][2]string{
-			{bundle.T(locale, "hr.post.field.expected_end"), newExpectedEnd},
+			{bundle.T(locale, "hr.post.field.expected_end"), FormatDateForLocale(newExpectedEnd, locale)},
 			{bundle.T(locale, "hr.post.field.au_certificate"), auValue},
 			{bundle.T(locale, "hr.post.field.status"), bundle.T(locale, "command.status.extended")},
 		})
@@ -67,11 +67,11 @@ func FormatExtendHRPost(record *Record, newExpectedEnd string, auCertificate *bo
 
 func FormatCloseHRPost(record *Record, locale string, bundle *i18n.Bundle) string {
 	rows := [][2]string{
-		{bundle.T(locale, "hr.post.field.first_sick_day"), record.StartDate},
+		{bundle.T(locale, "hr.post.field.first_sick_day"), FormatDateForLocale(record.StartDate, locale)},
 		{bundle.T(locale, "hr.post.field.status"), bundle.T(locale, "command.status.closed")},
 	}
 	if record.ExpectedEndDate != "" {
-		rows = append([][2]string{{bundle.T(locale, "hr.post.field.expected_end"), record.ExpectedEndDate}}, rows...)
+		rows = append([][2]string{{bundle.T(locale, "hr.post.field.expected_end"), FormatDateForLocale(record.ExpectedEndDate, locale)}}, rows...)
 	}
 
 	return formatFieldValuePost(

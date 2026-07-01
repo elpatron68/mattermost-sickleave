@@ -3,6 +3,27 @@
 
 import manifest from 'manifest';
 
+export function normalizeLocale(locale: string): string {
+    if (locale.toLowerCase().startsWith('de')) {
+        return 'de';
+    }
+    return 'en';
+}
+
+export function formatDateForLocale(isoDate: string, locale: string): string {
+    const parsed = parseISODate(isoDate);
+    if (!parsed) {
+        return isoDate;
+    }
+
+    const intlLocale = normalizeLocale(locale) === 'de' ? 'de-DE' : 'en-US';
+    return new Intl.DateTimeFormat(intlLocale, {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+    }).format(parsed);
+}
+
 export function getPluginURL(): string {
     if (window.basename) {
         return `${window.basename}/plugins/${manifest.id}`;
