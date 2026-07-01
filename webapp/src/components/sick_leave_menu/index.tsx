@@ -6,8 +6,8 @@ import {bindActionCreators, type Dispatch} from 'redux';
 
 import type {GlobalState} from '@mattermost/types/store';
 
-import {getTheme} from 'mattermost-redux/selectors/entities/preferences';
 import {getCurrentUserLocale} from 'mattermost-redux/selectors/entities/i18n';
+import {getTheme} from 'mattermost-redux/selectors/entities/preferences';
 
 import {closeSickLeaveMenu, selectSickLeaveMenuAction} from 'actions/sickleave';
 import {
