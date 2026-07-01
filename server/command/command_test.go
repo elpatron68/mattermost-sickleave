@@ -251,19 +251,18 @@ func TestSubmitUpdateDialogTransitionsToUpdated(t *testing.T) {
 	require.NotNil(t, record)
 	assert.Equal(t, sickleave.StatusUpdated, record.Status)
 	assert.Equal(t, "2026-06-25", record.ExpectedEndDate)
-	require.NotNil(t, record.AUCertificate)
-	assert.True(t, *record.AUCertificate)
+	assert.Equal(t, sickleave.AUYes, record.AUCertificate)
 }
 
 func TestSubmitExtendDialogTransitionsToExtended(t *testing.T) {
-	au := true
+	au := sickleave.AUYes
 	store := newMemoryStore()
 	store.active["user-1"] = &sickleave.Record{
 		ID:              "rec-1",
 		UserID:          "user-1",
 		StartDate:       "2026-06-20",
 		ExpectedEndDate: "2026-06-25",
-		AUCertificate:   &au,
+		AUCertificate:   au,
 		Status:          sickleave.StatusUpdated,
 		HRChannelID:     "channel-hr",
 		HRPostID:        "post-root",
@@ -301,19 +300,18 @@ func TestSubmitExtendDialogTransitionsToExtended(t *testing.T) {
 	require.NotNil(t, record)
 	assert.Equal(t, sickleave.StatusExtended, record.Status)
 	assert.Equal(t, "2026-06-30", record.ExpectedEndDate)
-	require.NotNil(t, record.AUCertificate)
-	assert.False(t, *record.AUCertificate)
+	assert.Equal(t, sickleave.AUNo, record.AUCertificate)
 }
 
 func TestSubmitExtendDialogRejectsNonExtensionDate(t *testing.T) {
-	au := true
+	au := sickleave.AUYes
 	store := newMemoryStore()
 	store.active["user-1"] = &sickleave.Record{
 		ID:              "rec-1",
 		UserID:          "user-1",
 		StartDate:       "2026-06-20",
 		ExpectedEndDate: "2026-06-25",
-		AUCertificate:   &au,
+		AUCertificate:   au,
 		Status:          sickleave.StatusUpdated,
 		HRChannelID:     "channel-hr",
 		HRPostID:        "post-root",
@@ -391,21 +389,6 @@ func TestHandleEndWithoutActiveCase(t *testing.T) {
 	response, err := handler.End("user-1", "channel-1")
 	require.NoError(t, err)
 	assert.Contains(t, response.Text, "do not have an active")
-}
-
-func TestParseAUCertificate(t *testing.T) {
-	t.Parallel()
-
-	value, ok := parseAUCertificate("yes")
-	assert.True(t, ok)
-	assert.True(t, value)
-
-	value, ok = parseAUCertificate("no")
-	assert.True(t, ok)
-	assert.False(t, value)
-
-	_, ok = parseAUCertificate("maybe")
-	assert.False(t, ok)
 }
 
 func mockMatchedHRThreadPost(channelID, rootID string) any {

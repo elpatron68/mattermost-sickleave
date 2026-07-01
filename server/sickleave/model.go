@@ -23,7 +23,7 @@ type Record struct {
 	TeamID          string         `json:"team_id"`
 	StartDate       string         `json:"start_date"`
 	ExpectedEndDate string         `json:"expected_end_date,omitempty"`
-	AUCertificate   *bool          `json:"au_certificate,omitempty"`
+	AUCertificate   AUCertificate  `json:"au_certificate,omitempty"`
 	Status          Status         `json:"status"`
 	HRPostID        string         `json:"hr_post_id"`
 	HRChannelID     string         `json:"hr_channel_id"`

@@ -27,6 +27,7 @@
   "dialog.c.au_certificate": "Medical certificate (AU)",
   "dialog.au.yes": "Yes",
   "dialog.au.no": "No",
+  "dialog.au.child": "Child sickness certificate",
   "dialog.au.unchanged": "Unchanged",
   "dialog.submit": "Submit",
   "dialog.cancel": "Cancel"

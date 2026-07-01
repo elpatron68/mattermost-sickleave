@@ -3,6 +3,13 @@
 
 import manifest from 'manifest';
 
+import de from '../i18n/de.json';
+import en from '../i18n/en.json';
+
+export function getTranslations(locale: string): Record<string, string> {
+    return normalizeLocale(locale) === 'de' ? de : en;
+}
+
 export function normalizeLocale(locale: string): string {
     if (locale.toLowerCase().startsWith('de')) {
         return 'de';

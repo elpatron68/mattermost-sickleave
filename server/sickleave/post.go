@@ -34,7 +34,7 @@ func FormatInitialHRPost(record *Record, user *model.User, locale string, bundle
 		})
 }
 
-func FormatUpdateHRPost(record *Record, expectedEnd string, auCertificate bool, locale string, bundle *i18n.Bundle) string {
+func FormatUpdateHRPost(record *Record, expectedEnd string, auCertificate AUCertificate, locale string, bundle *i18n.Bundle) string {
 	return formatFieldValuePost(
 		bundle.T(locale, "hr.post.b.title"),
 		bundle.T(locale, "hr.post.table.field"),
@@ -42,15 +42,15 @@ func FormatUpdateHRPost(record *Record, expectedEnd string, auCertificate bool, 
 		recordHashtag(record),
 		[][2]string{
 			{bundle.T(locale, "hr.post.field.expected_end"), FormatDateForLocale(expectedEnd, locale)},
-			{bundle.T(locale, "hr.post.field.au_certificate"), formatAUCertificate(auCertificate, locale, bundle)},
+			{bundle.T(locale, "hr.post.field.au_certificate"), auCertificate.Format(locale, bundle)},
 			{bundle.T(locale, "hr.post.field.status"), bundle.T(locale, "command.status.updated")},
 		})
 }
 
-func FormatExtendHRPost(record *Record, newExpectedEnd string, auCertificate *bool, locale string, bundle *i18n.Bundle) string {
+func FormatExtendHRPost(record *Record, newExpectedEnd string, auCertificate AUCertificate, locale string, bundle *i18n.Bundle) string {
 	auValue := bundle.T(locale, "hr.post.au.unchanged")
-	if auCertificate != nil {
-		auValue = formatAUCertificate(*auCertificate, locale, bundle)
+	if auCertificate != "" {
+		auValue = auCertificate.Format(locale, bundle)
 	}
 
 	return formatFieldValuePost(
@@ -100,11 +100,4 @@ func formatFieldValuePost(title, fieldHeader, valueHeader, hashtag string, rows 
 		b.WriteString(hashtag)
 	}
 	return strings.TrimRight(b.String(), "\n")
-}
-
-func formatAUCertificate(value bool, locale string, bundle *i18n.Bundle) string {
-	if value {
-		return bundle.T(locale, "hr.post.au.yes")
-	}
-	return bundle.T(locale, "hr.post.au.no")
 }

@@ -37,6 +37,7 @@
   "dialog.c.au_certificate_help": "Leave unchanged if your AU status has not changed.",
   "dialog.au.yes": "Yes",
   "dialog.au.no": "No",
+  "dialog.au.child": "Child sickness certificate",
   "dialog.au.unchanged": "Unchanged",
   "dialog.submit": "Submit",
   "dialog.date_placeholder": "MM/DD/YYYY",
@@ -66,5 +67,6 @@
   "hr.post.table.value": "Value",
   "hr.post.au.yes": "Yes",
   "hr.post.au.no": "No",
+  "hr.post.au.child": "Child sickness certificate",
   "hr.post.au.unchanged": "Unchanged"
 }

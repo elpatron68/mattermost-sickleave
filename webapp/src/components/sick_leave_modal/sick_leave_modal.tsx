@@ -3,7 +3,7 @@
 
 import React from 'react';
 import {FormattedMessage} from 'react-intl';
-import {addDays, formatISODate, parseISODate} from 'utils';
+import {addDays, formatISODate, getTranslations, parseISODate} from 'utils';
 
 import {changeOpacity} from 'mattermost-redux/utils/theme_utils';
 
@@ -140,7 +140,7 @@ export default class SickLeaveModal extends React.PureComponent<Props, State> {
         id: string,
         label: React.ReactNode,
         value: string,
-        options: Array<{value: string; label: React.ReactNode}>,
+        options: Array<{value: string; label: string}>,
         onChange: (value: string) => void,
         optional = false,
         error?: string,
@@ -170,10 +170,7 @@ export default class SickLeaveModal extends React.PureComponent<Props, State> {
                     )}
                     {optional && (
                         <option value='unchanged'>
-                            <FormattedMessage
-                                id='dialog.au.unchanged'
-                                defaultMessage='Unchanged'
-                            />
+                            {getTranslations(this.props.locale)['dialog.au.unchanged'] || 'Unchanged'}
                         </option>
                     )}
                     {options.map((option) => (
@@ -193,25 +190,11 @@ export default class SickLeaveModal extends React.PureComponent<Props, State> {
     private renderForm(): React.ReactNode {
         const {variant, fieldErrors, submitting} = this.props;
         const {startDate, expectedEndDate, auCertificate} = this.state;
-        const yesNoOptions = [
-            {
-                value: 'yes',
-                label: (
-                    <FormattedMessage
-                        id='dialog.au.yes'
-                        defaultMessage='Yes'
-                    />
-                ),
-            },
-            {
-                value: 'no',
-                label: (
-                    <FormattedMessage
-                        id='dialog.au.no'
-                        defaultMessage='No'
-                    />
-                ),
-            },
+        const translations = getTranslations(this.props.locale);
+        const auOptions = [
+            {value: 'yes', label: translations['dialog.au.yes'] || 'Yes'},
+            {value: 'no', label: translations['dialog.au.no'] || 'No'},
+            {value: 'child', label: translations['dialog.au.child'] || 'Child sickness certificate'},
         ];
 
         return (
@@ -257,7 +240,7 @@ export default class SickLeaveModal extends React.PureComponent<Props, State> {
                                 defaultMessage='Medical certificate (AU)'
                             />,
                             auCertificate,
-                            yesNoOptions,
+                            auOptions,
                             (value) => this.setState({auCertificate: value}),
                             false,
                             fieldErrors.au_certificate,
@@ -288,7 +271,7 @@ export default class SickLeaveModal extends React.PureComponent<Props, State> {
                                 defaultMessage='Medical certificate (AU)'
                             />,
                             auCertificate,
-                            yesNoOptions,
+                            auOptions,
                             (value) => this.setState({auCertificate: value}),
                             true,
                             fieldErrors.au_certificate,

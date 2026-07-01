@@ -27,6 +27,7 @@
   "dialog.c.au_certificate": "AU-Bescheinigung",
   "dialog.au.yes": "Ja",
   "dialog.au.no": "Nein",
+  "dialog.au.child": "AU-Kind",
   "dialog.au.unchanged": "Unverändert",
   "dialog.submit": "Absenden",
   "dialog.cancel": "Abbrechen"

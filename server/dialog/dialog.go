@@ -91,6 +91,7 @@ func BuildUpdateDialog(locale string, bundle *i18n.Bundle, opts UpdateDialogOpti
 				Options: []*model.PostActionOptions{
 					{Text: bundle.T(locale, "dialog.au.yes"), Value: "yes"},
 					{Text: bundle.T(locale, "dialog.au.no"), Value: "no"},
+					{Text: bundle.T(locale, "dialog.au.child"), Value: "child"},
 				},
 			},
 		},
@@ -129,6 +130,7 @@ func BuildExtendDialog(locale string, bundle *i18n.Bundle, opts ExtendDialogOpti
 					{Text: bundle.T(locale, "dialog.au.unchanged"), Value: "unchanged"},
 					{Text: bundle.T(locale, "dialog.au.yes"), Value: "yes"},
 					{Text: bundle.T(locale, "dialog.au.no"), Value: "no"},
+					{Text: bundle.T(locale, "dialog.au.child"), Value: "child"},
 				},
 			},
 		},

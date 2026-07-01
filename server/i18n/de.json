@@ -37,6 +37,7 @@
   "dialog.c.au_certificate_help": "Unverändert lassen, wenn sich der AU-Status nicht geändert hat.",
   "dialog.au.yes": "Ja",
   "dialog.au.no": "Nein",
+  "dialog.au.child": "AU-Kind",
   "dialog.au.unchanged": "Unverändert",
   "dialog.submit": "Absenden",
   "dialog.date_placeholder": "TT.MM.JJJJ",
@@ -66,5 +67,6 @@
   "hr.post.table.value": "Wert",
   "hr.post.au.yes": "Ja",
   "hr.post.au.no": "Nein",
+  "hr.post.au.child": "AU-Kind",
   "hr.post.au.unchanged": "Unverändert"
 }

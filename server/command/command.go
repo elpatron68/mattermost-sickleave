@@ -240,12 +240,8 @@ func (h *Handler) handleStatus(args *model.CommandArgs, locale string) *model.Co
 	}
 
 	auLabel := h.bundle.T(locale, "hr.post.au.unchanged")
-	if record.AUCertificate != nil {
-		if *record.AUCertificate {
-			auLabel = h.bundle.T(locale, "hr.post.au.yes")
-		} else {
-			auLabel = h.bundle.T(locale, "hr.post.au.no")
-		}
+	if record.AUCertificate != "" {
+		auLabel = record.AUCertificate.Format(locale, h.bundle)
 	}
 
 	return ephemeral(h.bundle.T(
@@ -452,20 +448,20 @@ func (h *Handler) SubmitUpdateDialog(request *model.SubmitDialogRequest) (*model
 		return dialogFieldError(locale, h.bundle, "au_certificate", "dialog.error.au_certificate_required"), nil
 	}
 
-	auCertificate, valid := parseAUCertificate(auValue)
+	auCertificate, valid := sickleave.ParseAUCertificate(auValue)
 	if !valid {
 		return dialogFieldError(locale, h.bundle, "au_certificate", "dialog.error.au_certificate_invalid"), nil
 	}
 
 	active.ExpectedEndDate = rawExpectedEnd
-	active.AUCertificate = &auCertificate
+	active.AUCertificate = auCertificate
 	active.Status = sickleave.StatusUpdated
 	active.History = append(active.History, sickleave.HistoryEntry{
 		Variant:   "B",
 		Timestamp: time.Now().UTC(),
 		Data: map[string]any{
 			"expected_end_date": rawExpectedEnd,
-			"au_certificate":    auCertificate,
+			"au_certificate":    string(auCertificate),
 		},
 	})
 
@@ -523,14 +519,14 @@ func (h *Handler) SubmitExtendDialog(request *model.SubmitDialogRequest) (*model
 		return dialogFieldError(locale, h.bundle, "expected_end_date", "dialog.error.expected_end_not_after_current"), nil
 	}
 
-	var auUpdate *bool
+	var auUpdate sickleave.AUCertificate
 	if auValue, ok := request.Submission["au_certificate"].(string); ok && strings.TrimSpace(auValue) != "" && auValue != "unchanged" {
-		auCertificate, valid := parseAUCertificate(auValue)
+		auCertificate, valid := sickleave.ParseAUCertificate(auValue)
 		if !valid {
 			return dialogFieldError(locale, h.bundle, "au_certificate", "dialog.error.au_certificate_invalid"), nil
 		}
-		auUpdate = &auCertificate
-		active.AUCertificate = auUpdate
+		auUpdate = auCertificate
+		active.AUCertificate = auCertificate
 	}
 
 	active.ExpectedEndDate = rawExpectedEnd
@@ -538,8 +534,8 @@ func (h *Handler) SubmitExtendDialog(request *model.SubmitDialogRequest) (*model
 	historyData := map[string]any{
 		"expected_end_date": rawExpectedEnd,
 	}
-	if auUpdate != nil {
-		historyData["au_certificate"] = *auUpdate
+	if auUpdate != "" {
+		historyData["au_certificate"] = string(auUpdate)
 	}
 	active.History = append(active.History, sickleave.HistoryEntry{
 		Variant:   "C",
@@ -618,17 +614,6 @@ func (h *Handler) sendEphemeralSuccess(request *model.SubmitDialogRequest, local
 		Message:   h.bundle.T(locale, key),
 	}
 	h.client.Post.SendEphemeralPost(request.UserId, ephemeralPost)
-}
-
-func parseAUCertificate(value string) (bool, bool) {
-	switch strings.ToLower(strings.TrimSpace(value)) {
-	case "yes":
-		return true, true
-	case "no":
-		return false, true
-	default:
-		return false, false
-	}
 }
 
 func dialogError(locale string, bundle *i18n.Bundle, key string, args ...any) *model.SubmitDialogResponse {
