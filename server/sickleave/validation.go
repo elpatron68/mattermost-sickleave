@@ -2,12 +2,18 @@ package sickleave
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
 var dateLayout = "2006-01-02"
 
 func ParseDate(value string) (time.Time, error) {
+	value = strings.TrimSpace(value)
+	if len(value) >= 10 {
+		value = value[:10]
+	}
+
 	parsed, err := time.Parse(dateLayout, value)
 	if err != nil {
 		return time.Time{}, fmt.Errorf("invalid date")

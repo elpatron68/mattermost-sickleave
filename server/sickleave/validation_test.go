@@ -16,6 +16,12 @@ func TestParseDate(t *testing.T) {
 	assert.Equal(t, 2026, parsed.Year())
 	assert.Equal(t, time.June, parsed.Month())
 	assert.Equal(t, 28, parsed.Day())
+
+	parsed, err = ParseDate("2026-07-01T00:00:00.000Z")
+	require.NoError(t, err)
+	assert.Equal(t, 2026, parsed.Year())
+	assert.Equal(t, time.July, parsed.Month())
+	assert.Equal(t, 1, parsed.Day())
 }
 
 func TestValidateStartDate(t *testing.T) {

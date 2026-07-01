@@ -149,10 +149,7 @@ func (h *Handler) handleStart(args *model.CommandArgs, locale string) (*model.Co
 		return ephemeral(h.bundle.T(locale, "command.error.active_exists", h.commandTrigger())), nil
 	}
 
-	submitURL, err := h.dialogSubmitURL()
-	if err != nil {
-		return nil, err
-	}
+	submitURL := h.dialogSubmitURL()
 
 	maxBackdate := settings.MaxBackdateDays
 	if maxBackdate <= 0 {
@@ -186,10 +183,7 @@ func (h *Handler) handleUpdate(args *model.CommandArgs, locale string) (*model.C
 		return ephemeral(h.bundle.T(locale, "command.error.update_not_allowed", h.commandTrigger())), nil
 	}
 
-	submitURL, err := h.dialogSubmitURL()
-	if err != nil {
-		return nil, err
-	}
+	submitURL := h.dialogSubmitURL()
 
 	if appErr := dialog.OpenUpdateDialog(h.dialogAPI, args.TriggerId, submitURL, locale, h.bundle, dialog.UpdateDialogOptions{
 		StartDate: active.StartDate,
@@ -217,10 +211,7 @@ func (h *Handler) handleExtend(args *model.CommandArgs, locale string) (*model.C
 		return ephemeral(h.bundle.T(locale, "command.error.extend_not_allowed", h.commandTrigger())), nil
 	}
 
-	submitURL, err := h.dialogSubmitURL()
-	if err != nil {
-		return nil, err
-	}
+	submitURL := h.dialogSubmitURL()
 
 	if appErr := dialog.OpenExtendDialog(h.dialogAPI, args.TriggerId, submitURL, locale, h.bundle, dialog.ExtendDialogOptions{
 		CurrentExpectedEnd: active.ExpectedEndDate,
@@ -287,12 +278,10 @@ func (h *Handler) localeForUser(userID string) string {
 	return i18n.LocaleForUser(user, h.settings().DefaultLocale)
 }
 
-func (h *Handler) dialogSubmitURL() (string, error) {
-	siteURL, err := h.siteURL()
-	if err != nil {
-		return "", err
-	}
-	return fmt.Sprintf("%s/plugins/%s/api/v1/dialog/submit", siteURL, h.pluginID), nil
+func (h *Handler) dialogSubmitURL() string {
+	// Use a relative plugin path so Mattermost routes dialog submissions locally
+	// (DoLocalRequest) instead of making an outbound HTTP call to SiteURL.
+	return fmt.Sprintf("/plugins/%s/api/v1/dialog/submit", h.pluginID)
 }
 
 func (h *Handler) statusLabel(locale string, status sickleave.Status) string {
